@@ -203,13 +203,13 @@ export default {
         //     return this.$message.error('请先分配任务')
         // }
         this.imageListVisible = false
-        var image = this.queryImageById(this.row.image_id)
+        var image = this.queryImageById(row.image_id)
         if (image) {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
         }
     },
     queryImageById: function(id) {
-        for (var i = 0; i < this.accounts.length; ++i) {
+        for (var i = 0; i < this.images.length; ++i) {
             if (this.images[i].image_id === id) {
                 return this.images[i]
             }
