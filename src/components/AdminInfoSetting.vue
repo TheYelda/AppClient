@@ -1,5 +1,6 @@
 <template>
     <el-row :gutter="20">
+        
         <el-col :span="24">
             <el-form :model="accountForm">
                 <el-form-item label="工号">
@@ -44,18 +45,22 @@ export default {
     }
   },
   created() {
-    var id = window.localStorage.getItem('user').account_id
-    this.$http.get(config.apiUrl + '/accounts/' + id).then(res => {
-        this.$message.success(res.body.message)
-        delete res.body.message
-        this.accountForm = res.body
-    }, res => {
-        this.$message.error(res.body.message)
-        console.log(res)
-    });
+    this.loadInfo()
   },
 
   methods: {
+    loadInfo() {
+      var id = window.localStorage.getItem('user').account_id
+        this.$http.get(config.apiUrl + '/accounts/' + id).then(res => {
+        //   this.$message.success(res.body.message)
+          delete res.body.message
+          this.accountForm = res.body
+      }, res => {
+          this.$message.error(res.body.message)
+          // eslint-disable-next-line
+          console.log(res)
+      });
+    },
     logout() {
       this.$http.delete(config.apiUrl + '/authorization/').then(res => {
         this.$message.success(res.body.message)
@@ -63,6 +68,7 @@ export default {
         this.$emit('pass', 0)
       }, res => {
         this.$message.error(res.body.message)
+        // eslint-disable-next-line
         console.log(res)
       });
     }

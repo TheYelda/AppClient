@@ -5,7 +5,7 @@
             <el-table-column prop="job_id" label="任务编号"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
             <el-table-column prop="label_id" label="标注编号"></el-table-column>
-            <el-table-column prop="job_state" label="状态"></el-table-column>
+            <el-table-column prop="state" label="状态"></el-table-column>
             <el-table-column prop="finished_date" label="完成日期"></el-table-column>
         </el-table>
     </el-row>
@@ -27,16 +27,23 @@ export default {
   },
   created() {
     // load data
-    this.$http.get(config.apiUrl + '/jobs').then(res => {  // NEED
-        this.$message.success(res.body.message)
-        this.jobs = res.body.data;
-    }, res => {
-        this.$message.error('请求任务信息错误')
-        console.log(res)
-    });
+    this.loadJobs()
   },
   methods: {
-    // ...
+    loadJobs() {
+      this.$http.get(config.apiUrl + '/jobs').then(res => {  // NEED
+        // this.$message.success(res.body.message)
+        this.jobs = res.body.data;
+        var jobStateCode = { '200': '未标注', '201': '标注中', '202': '已完成' }
+        for (var i = 0; i < this.jobs.length; i++) {
+            this.jobs[i].state = jobStateCode[this.jobs[i].job_state]
+        }
+      }, res => {
+        this.$message.error('请求任务信息错误')
+        // eslint-disable-next-line
+        console.log(res)
+      });
+    }
   }
 }
 </script>

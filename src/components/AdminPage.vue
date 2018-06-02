@@ -32,7 +32,7 @@ export default {
     AdminImageList,
     AdminJobList,
     AdminAccountList,
-    AdminInfoSetting
+    AdminInfoSetting,
   },
   data() {
       return {
@@ -48,6 +48,7 @@ export default {
         this.$emit('logout', 0)  // hello world
       }, 1000)
     } else {
+        // eslint-disable-next-line
         console.log(userInfo)
     }
   },

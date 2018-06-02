@@ -29,6 +29,9 @@ export default {
       helloWorld: 0,
     }
   },
+  created() {
+    // NEED
+  },
   methods: {
     whichPage(code) {
       this.helloWorld = code
