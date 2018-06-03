@@ -141,6 +141,7 @@ export default {
     },
     successImageUpload(res, file) {
         this.$message.success(file.name + ' 上传成功')
+        this.loadImages()
     },
     cancelImageUpload() {
         this.imageUploadVisible = false

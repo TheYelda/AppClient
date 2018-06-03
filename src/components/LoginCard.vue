@@ -70,6 +70,7 @@ export default {
             }
           }, res => {
             // eslint-disable-next-line
+            this.$message.error(res.body.message)
             console.log(res)
           })
       },
