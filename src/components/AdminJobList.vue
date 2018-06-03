@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     loadJobs() {
-      this.$http.get(config.apiUrl + '/jobs').then(res => {  // NEED
+      this.$http.get(config.apiUrl + '/jobs/').then(res => {  // NEED
         // this.$message.success(res.body.message)
         this.jobs = res.body.data;
         var jobStateCode = { '200': '未标注', '201': '标注中', '202': '已完成' }

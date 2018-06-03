@@ -31,6 +31,15 @@ export default {
   },
   created() {
     // NEED
+    var userInfo = JSON.parse(window.localStorage.getItem('user'))
+    if (userInfo) {
+      var authorityCode = [ 100, 101, 102, 103 ]
+      for (var i = 0; i < authorityCode.length; i++) {
+        if (userInfo.authority == authorityCode[i]) {
+          this.helloWorld = i;
+        }
+      }
+    }
   },
   methods: {
     whichPage(code) {

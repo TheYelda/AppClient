@@ -50,7 +50,8 @@ export default {
 
   methods: {
     loadInfo() {
-      var id = window.localStorage.getItem('user').account_id
+      var userInfo = JSON.parse(window.localStorage.getItem('user'))
+      var id = userInfo.account_id
         this.$http.get(config.apiUrl + '/accounts/' + id).then(res => {
         //   this.$message.success(res.body.message)
           delete res.body.message
