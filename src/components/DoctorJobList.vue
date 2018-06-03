@@ -68,7 +68,7 @@ export default {
         console.log(res)
       });
     },
-    clickJobList(row) {
+    clickJobRow(row) {
         this.jobListVisible = false
         this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.filename
