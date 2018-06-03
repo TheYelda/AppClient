@@ -61,7 +61,7 @@
                     </el-button-group>
                 </el-col>
                 <el-col :span="4">
-                    <AppLabel />
+                    <AppLabel :label="labelId" :submitId="imageId" @createLabel="setLabelId"/>
                 </el-col>
             </el-row>
         </el-col>
@@ -101,7 +101,9 @@ export default {
       // info
       imageListVisible: true,
       imageUrl: '',
-      imageIndex: 0
+      imageIndex: 0,
+      labelId: -1,
+      imageId: -1
     }
   },
   created() {
@@ -229,6 +231,7 @@ export default {
         if (image) {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
         }
+        this.submitId = row.image_id  // trick name
     },
     queryImageById(id) {
         for (var i = 0; i < this.images.length; ++i) {
@@ -286,6 +289,10 @@ export default {
             this.imageIndex = this.imageIndex+1
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
         }
+    },
+    setLabelId(id) {
+        this.labelId = id
+        this.loadJobs()
     }
   }
 }

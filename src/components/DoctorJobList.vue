@@ -1,6 +1,7 @@
 <template>
     <el-row>
-        <el-table :data="jobs" stripe>
+        <el-col v-if="jobListVisible">
+        <el-table :data="jobs" stripe @row-click="clickJobRow">
             <el-table-column type="index" width="55"></el-table-column>
             <el-table-column prop="job_id" label="任务编号"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
@@ -8,6 +9,23 @@
             <el-table-column prop="state" label="状态"></el-table-column>
             <el-table-column prop="finished_date" label="完成日期"></el-table-column>
         </el-table>
+        </el-col>
+        <el-col v-else>
+            <el-row :gutter="20">
+                <el-col :span="20">
+                    <el-button @click="backToJobList">返回</el-button>
+                    <AppImage :url="imageUrl"/>
+                    <el-button-group>
+                    <el-button @click="imagePrevious" icon="el-icon-arrow-left">上一张</el-button>
+                    <el-button>第 {{ imageIndex+1 }} 张</el-button>
+                    <el-button @click="imageNext">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+                    </el-button-group>
+                </el-col>
+                <el-col :span="4">
+                    <AppLabel :label="labelId" :submitId="jobId" @createLabel="setLabelId"/>
+                </el-col>
+            </el-row>
+        </el-col>
     </el-row>
 </template>
 
@@ -22,7 +40,12 @@ export default {
 
   data() {
     return {
-      jobs: []
+      jobs: [],
+      jobListVisible: true,
+      jobIndex: 0,
+      imageUrl: '',
+      labelId: -1,
+      jobId: -1
     }
   },
   created() {
@@ -44,6 +67,26 @@ export default {
         // eslint-disable-next-line
         console.log(res)
       });
+    },
+    clickJobList(row) {
+        this.jobListVisible = false
+        this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
+            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.filename
+        }, res => {
+            // eslint-disable-next-line
+            console.log(res)
+        })
+        if (!row.label_id) {
+            this.labelId = -1
+        }
+        this.jobId = row.job_id
+    },
+    backToJobList() {
+        this.jobListVisible = true
+    },
+    setLabelId(id) {
+        this.labelId = id
+        this.loadJobs()
     }
   }
 }

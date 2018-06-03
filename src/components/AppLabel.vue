@@ -28,12 +28,16 @@
 </template>
 
 <script>
-// import config from './AppConfig.vue'
+import config from './AppConfig.vue'
 
 export default {
   name: 'AppLabel',
   components: {
     // ...
+  },
+  props: {
+      label: Number,
+      submitId: Number
   },
   data() {
       return {
@@ -51,15 +55,86 @@ export default {
               glaucoma: false,
               others: false,
               comment: ''
-          }
+          },
+          hasLabel: false,
+          canSubmit: false
+      }
+  },
+  created() {
+      if (this.label > 0) {
+          this.hasLabel = true
+          this.loadLabel()
       }
   },
   methods: {
+      loadLabel() {
+        if (this.label > 0) {
+            this.hasLabel = true
+            this.$http.get(config.apiUrl + '/labels/' + this.label).then(res => {
+                this.$message.success(res.body.message)
+                delete res.body.message
+                this.labelForm = res.body
+            }, res => {
+                // eslint-disable-next-line
+                console.log(res)
+            })
+        }
+      },
       saveLabelForm() {
-          // ...
+          if (!this.hasLabel) {
+              this.$http.post(config.apiUrl + '/labels/', this.labelForm).then(res => {
+                  this.$message.success(res.body.message)
+                  this.hasLabel = true
+                  this.$emit('createLabel', res.body.label_id)
+                  this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
+                     label_id: this.label,
+                     job_state: 201  // 标注中
+                  }).then(res => {
+                    this.$message.success(res.body.message)
+                  }, res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                  })
+              }, res => {
+                  // eslint-disable-next-line
+                  console.log(res)
+              })
+          } else {
+              this.$http.put(config.apiUrl + '/labels/', this.labelForm).then(res => {
+                  this.$message.success(res.body.message)
+              }, res => {
+                  // eslint-disable-next-line
+                  console.log(res)
+              })
+          }
       },
       submitLabelForm() {
-          // ...
+          if (!this.hasLabel) {
+              this.$message.info('请先保存再提交')
+          } else {
+              var userInfo = JSON.parse(window.localStorage.getItem('user'))
+              if (userInfo.authority == 101) {
+                 this.$http.put(config.apiUrl + '/images/' + this.submitId, {
+                     label_id: this.label,
+                     image_state: 303  // 已完成
+                 }).then(res => {
+                     this.$message.success(res.body.message)
+                 }, res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                 })
+              } else if (userInfo.authority == 102) {
+                 this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
+                     label_id: this.label,
+                     job_state: 202  // 已完成
+                 }).then(res => {
+                     this.$message.success(res.body.message)
+                 }, res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                 })
+              }
+          }
       }
   }
 }
