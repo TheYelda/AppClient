@@ -100,7 +100,7 @@ export default {
                   console.log(res)
               })
           } else {
-              this.$http.put(config.apiUrl + '/labels/', this.labelForm).then(res => {
+              this.$http.put(config.apiUrl + '/labels/' + this.label, this.labelForm).then(res => {
                   this.$message.success(res.body.message)
               }, res => {
                   // eslint-disable-next-line
