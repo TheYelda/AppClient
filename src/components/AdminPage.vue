@@ -6,7 +6,7 @@
 
     <el-main>
         <el-card>
-            <div v-if="inImageList()"><AdminImageList/></div>
+            <div v-if="inImageList()"><AdminImageList @pass="passCode"/></div>
             <div v-if="inJobList()"><AdminJobList/></div>
             <div v-if="inAccountList()"><AdminAccountList/></div>
             <div v-if="inInfoSetting()"><AppInfoSetting @pass="passCode"/></div>

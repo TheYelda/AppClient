@@ -118,7 +118,11 @@ export default {
                 this.images[i].state = imagesStateCode[this.images[i].image_state]
             }
         }, res => {
-            this.$message.error('请求图像信息错误')
+            if (res.status == 401) {
+                // this.$message.error(res.body.message)
+                // window.localStorage.removeItem('user')
+                this.$emit('pass', 0)
+            }
             // eslint-disable-next-line
             console.log(res)
         })
