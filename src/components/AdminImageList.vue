@@ -231,7 +231,7 @@ export default {
         if (image) {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
         }
-        this.submitId = row.image_id  // trick name
+        this.imageId = row.image_id  // trick name
     },
     queryImageById(id) {
         for (var i = 0; i < this.images.length; ++i) {
