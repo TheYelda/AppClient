@@ -15,11 +15,6 @@
                 <el-col :span="20">
                     <el-button @click="backToJobList">返回</el-button>
                     <AppImage :url="imageUrl"/>
-                    <el-button-group>
-                    <el-button @click="imagePrevious" icon="el-icon-arrow-left">上一张</el-button>
-                    <el-button>第 {{ imageIndex+1 }} 张</el-button>
-                    <el-button @click="imageNext">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
-                    </el-button-group>
                 </el-col>
                 <el-col :span="4">
                     <AppLabel :label="labelId" :submitId="jobId" @createLabel="setLabelId"/>
@@ -31,11 +26,14 @@
 
 <script>
 import config from './AppConfig.vue'
+import AppImage from './AppImage.vue'
+import AppLabel from './AppLabel.vue'
 
 export default {
   name: 'DoctorJobList',
   components: {
-    // ...
+    AppImage,
+    AppLabel
   },
 
   data() {

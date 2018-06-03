@@ -87,7 +87,7 @@ export default {
                   this.hasLabel = true
                   this.$emit('createLabel', res.body.label_id)
                   this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
-                     label_id: this.label,
+                     label_id: res.body.label_id,
                      job_state: 201  // 标注中
                   }).then(res => {
                     this.$message.success(res.body.message)
