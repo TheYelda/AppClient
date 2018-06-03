@@ -107,11 +107,12 @@ export default {
                   console.log(res)
               })
           }
+          this.canSubmit = true
       },
       submitLabelForm() {
-          if (!this.hasLabel) {
+          if (!this.hasLabel || !this.canSubmit) {
               this.$message.info('请先保存再提交')
-          } else {
+          } else if (this.canSubmit) {
               var userInfo = JSON.parse(window.localStorage.getItem('user'))
               if (userInfo.authority == 101) {
                  this.$http.put(config.apiUrl + '/images/' + this.submitId, {
@@ -134,6 +135,7 @@ export default {
                     console.log(res)
                  })
               }
+              this.canSubmit = false
           }
       }
   }
