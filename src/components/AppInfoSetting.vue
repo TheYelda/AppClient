@@ -22,7 +22,7 @@
                     <el-input v-model="accountForm.password"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button >修改账户信息</el-button>
+                    <el-button @click="postAccountForm">修改账户信息</el-button>
                     <el-button type="primary" @click="logout">登出</el-button>
                 </el-form-item>
             </el-form>
@@ -34,7 +34,7 @@
 import config from './AppConfig.vue'
 
 export default {
-  name: 'AdminInfoSetting',
+  name: 'AppInfoSetting',
   components: {
     // ...
   },
@@ -61,6 +61,17 @@ export default {
           // eslint-disable-next-line
           console.log(res)
       });
+    },
+    postAccountForm() {
+        var data = this.accountForm, id = this.accountForm.account_id
+        delete data.account_id
+        this.$http.post(config.apiUrl + '/account/' + id, data).post(res => {
+            this.$message.success(res.body.message)
+            this.loadInfo()
+        }, res => {
+            // eslint-disable-next-line
+            console.log(res)
+        })
     },
     logout() {
       this.$http.delete(config.apiUrl + '/authorization/').then(res => {

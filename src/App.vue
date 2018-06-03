@@ -30,7 +30,6 @@ export default {
     }
   },
   created() {
-    // NEED
     var userInfo = JSON.parse(window.localStorage.getItem('user'))
     if (userInfo) {
       var authorityCode = [ 100, 101, 102, 103 ]

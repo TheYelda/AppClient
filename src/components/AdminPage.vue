@@ -9,7 +9,7 @@
             <div v-if="inImageList()"><AdminImageList/></div>
             <div v-if="inJobList()"><AdminJobList/></div>
             <div v-if="inAccountList()"><AdminAccountList/></div>
-            <div v-if="inInfoSetting()"><AdminInfoSetting @pass="passCode"/></div>
+            <div v-if="inInfoSetting()"><AppInfoSetting @pass="passCode"/></div>
         </el-card>
     </el-main>
 
@@ -23,7 +23,7 @@ import AppHeader from './AppHeader.vue'
 import AdminImageList from './AdminImageList.vue'
 import AdminJobList from './AdminJobList.vue'
 import AdminAccountList from './AdminAccountList.vue'
-import AdminInfoSetting from './AdminInfoSetting.vue'
+import AppInfoSetting from './AppInfoSetting.vue'
 
 export default {
   name: 'AdminPage',
@@ -32,7 +32,7 @@ export default {
     AdminImageList,
     AdminJobList,
     AdminAccountList,
-    AdminInfoSetting,
+    AppInfoSetting,
   },
   data() {
       return {
