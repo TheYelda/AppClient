@@ -4,7 +4,7 @@
       <HelloWorld msg="Hello world" @goPage="whichPage"/>
     </div>
     <div v-else-if="isAdmin()"><AdminPage @logout="whichPage"/></div>
-    <div v-else-if="isDoctor()"><DoctorPage /></div>
+    <div v-else-if="isDoctor()"><DoctorPage @logout="whichPage"/></div>
     <div v-else-if="isGuest()"><GuestPage /></div>
   </div>
 </template>
