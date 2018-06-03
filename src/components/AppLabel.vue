@@ -21,8 +21,8 @@
         
 
         <el-form-item>
-            <el-button @click="saveLabelForm">保存</el-button>
-            <el-button type="primary" @click="submitLabelForm">提交</el-button>
+            <el-button @click="saveLabelForm" icon="el-icon-edit">保存</el-button>
+            <el-button type="primary" @click="submitLabelForm" icon="el-icon-circle-check">提交</el-button>
         </el-form-item>
     </el-form>
 </template>

@@ -4,6 +4,7 @@
         <div>
             <el-button @click="imageUpload">导入图像</el-button>
             <el-button type="primary" @click="imageAssign">分配任务</el-button>
+            <el-button type="danger" @click="imageDelete" icon="el-icon-delete">删除图像</el-button>
         </div>
         <el-table ref="imageTable" :data="images" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
             <el-table-column type="selection" width="55"></el-table-column>
@@ -14,7 +15,7 @@
             </el-table-column>
         </el-table>
 
-        <el-dialog title="上传图片" :visible.sync="imageUploadVisible" center :show-close="false">
+        <el-dialog title="导入图像" :visible.sync="imageUploadVisible" center :show-close="false">
             <el-upload
                 ref="upload"
                 :action="imageUploadUrl"
@@ -32,7 +33,7 @@
             </el-upload>
         </el-dialog>
 
-        <el-dialog title="医生信息" :visible.sync="imageAssignVisible" center :show-close="false">
+        <el-dialog title="分配任务" :visible.sync="imageAssignVisible" center :show-close="false">
             <el-button type="primary" size="small" @click="confirmImageAssign">确定分配</el-button>
             <el-button size="small" @click="cancelImageAssign">关闭</el-button>
             <el-table ref="doctorTable" :data="doctors" @selection-change="changeDoctorSelection">
@@ -41,13 +42,25 @@
                 <el-table-column prop="username" label="账号"></el-table-column>
             </el-table>
         </el-dialog>
+
+        <el-dialog title="删除图像" :visible.sync="imageDeleteVisible" center :show-close="false">
+            <el-button size="small" @click="confirmImageDelete">确定</el-button>
+            <el-button type="success" size="small" @click="cancelImageDelete">取消</el-button>
+        </el-dialog>
+
         </el-col>
         <el-col v-else>
             <el-row :gutter="20">
-                <el-col :span="14">
+                <el-col :span="20">
+                    <el-button @click="backToImageList">返回</el-button>
                     <AppImage :url="imageUrl"/>
+                    <el-button-group>
+                    <el-button @click="imagePrevious" icon="el-icon-arrow-left">上一张</el-button>
+                    <el-button>第 {{ imageIndex+1 }} 张</el-button>
+                    <el-button @click="imageNext">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+                    </el-button-group>
                 </el-col>
-                <el-col :span="8">
+                <el-col :span="4">
                     <AppLabel />
                 </el-col>
             </el-row>
@@ -78,13 +91,17 @@ export default {
 
       // assign
       imageAssignVisible: false,
-      imageSelection: [],
+      imageSelection: [],  // also for delete
       doctors: [],
       doctorSelection: [],
 
+      // delete
+      imageDeleteVisible: false,
+
       // info
       imageListVisible: true,
-      imageUrl: ''
+      imageUrl: '',
+      imageIndex: 0
     }
   },
   created() {
@@ -208,13 +225,62 @@ export default {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
         }
     },
-    queryImageById: function(id) {
+    queryImageById(id) {
         for (var i = 0; i < this.images.length; ++i) {
             if (this.images[i].image_id === id) {
+                this.imageIndex = i
                 return this.images[i]
             }
         }
         return null
+    },
+
+    imageDelete() {
+        if (!this.imageSelection.length) {
+            this.$message.error('请选择需要删除的图像')
+        } else {
+            for (var i = 0; i < this.imageSelection.length; i++) {
+                if (this.imageSelection[i].state != '未分配') {
+                    return this.$message.error('只能删除未分配的图像')
+                }
+            }
+            this.imageDeleteVisible = true
+        }
+    },
+    confirmImageDelete() {
+        this.imageDeleteVisible = false
+        for (var i = 0; i < this.imageSelection.length; i++) {
+            this.$http.delete(config.apiUrl + '/images/' + this.imageSelection[i].image_id).then(res => {
+                this.$message.success(res.body.message)
+                this.loadImages();
+            }, res => {
+                // eslint-disable-next-line
+                console.log(res);
+            })
+        }
+    },
+    cancelImageDelete() {
+        this.imageDeleteVisible = false
+    },
+
+    backToImageList() {
+        this.imageListVisible = true
+    },
+    imagePrevious() {
+        if (this.imageIndex == 0) {
+            return this.$message.info('当前已经是第一张图像了')
+        } else {
+            this.imageIndex = this.imageIndex-1
+            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+        }
+    },
+    imageNext() {
+        if (this.imageIndex == this.images.length-1) {
+            return this.$message.info('当前已经是最后一张图像了')
+        } else {
+            this.imageIndex = this.imageIndex+1
+            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+        }
     }
   }
 }
