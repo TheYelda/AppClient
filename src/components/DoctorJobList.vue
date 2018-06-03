@@ -81,6 +81,7 @@ export default {
     },
     backToJobList() {
         this.jobListVisible = true
+        this.loadJobs()
     },
     setLabelId(id) {
         this.labelId = id

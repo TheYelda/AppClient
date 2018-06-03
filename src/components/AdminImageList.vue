@@ -273,6 +273,7 @@ export default {
 
     backToImageList() {
         this.imageListVisible = true
+        this.loadImages()
     },
     imagePrevious() {
         if (this.imageIndex == 0) {
