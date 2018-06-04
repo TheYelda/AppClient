@@ -1,7 +1,18 @@
 <template>
     <el-row :gutter="20">
-        
-        <el-col :span="24">
+        <el-col :span="6">
+            <el-upload
+                class="avatar-uploader"
+                action="photoUploadUrl"
+                :show-file-list="false"
+                :auto-upload="true"
+                :on-success="handlePhotoSuccess"
+                :before-upload="beforePhotoUpload">
+                <img v-if="photoUrl" :src="photoUrl" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>    
+            </el-upload>
+        </el-col>
+        <el-col :span="14">
             <el-form :model="accountForm">
                 <el-form-item label="工号">
                     <el-input v-model="accountForm.account_id" :disabled="true" :placeholder="accountForm.account_id"></el-input>
@@ -41,7 +52,9 @@ export default {
 
   data() {
     return {
-      accountForm: {}
+      accountForm: {},
+      photoUrl: '',
+      photoUploadUrl: config.apiUrl + '/uploads/photos/'
     }
   },
   created() {
@@ -56,6 +69,7 @@ export default {
         //   this.$message.success(res.body.message)
           delete res.body.message
           this.accountForm = res.body
+          this.photoUrl = config.apiUrl + '/uploads/photos/' + res.body.photo
       }, res => {
           this.$message.error(res.body.message)
           // eslint-disable-next-line
@@ -83,6 +97,24 @@ export default {
         // eslint-disable-next-line
         console.log(res)
       });
+    },
+    beforePhotoUpload: function(file) {
+        const isJPGorPNG = (file.type === 'image/jpeg' || file.type === 'image/png');
+        const isSizeLimit = file.size / 1024 / 1024 < 2;
+
+        if (!isJPGorPNG) {
+            this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!');
+        }
+        if (!isSizeLimit) {
+            this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return isJPGorPNG && isSizeLimit;
+    },
+    handlePhotoSuccess: function(response) {
+        if (response.message == '头像上传成功') {
+            this.$message.success(response.message);
+            this.loadInfo();
+        }
     }
   }
 }
@@ -90,4 +122,27 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 20vw;
+    height: 20vw;
+    line-height: 20vw;
+    text-align: center;
+  }
+  .avatar {
+    width: 20vw;
+    height: 20vw;
+    display: block;
+  }
 </style>
