@@ -226,12 +226,18 @@ export default {
         // if (row.state == '未分配') {
         //     return this.$message.error('请先分配任务')
         // }
-        this.imageListVisible = false
-        var image = this.queryImageById(row.image_id)
-        if (image) {
-            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
+        if (row.state == '有分歧' || row.state == '已完成') {
+            this.imageListVisible = false
+            var image = this.queryImageById(row.image_id)
+            if (image) {
+                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
+            }
+            if (row.state == '已完成') {
+                this.imageId = -1;
+            } else {
+                this.imageId = row.image_id  // trick name
+            }
         }
-        this.imageId = row.image_id  // trick name
     },
     queryImageById(id) {
         for (var i = 0; i < this.images.length; ++i) {

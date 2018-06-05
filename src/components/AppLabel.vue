@@ -1,23 +1,23 @@
 <template>
   <el-form :model="labelForm">
-        <el-form-item label="QUALITY"><el-switch v-model="labelForm.quality"></el-switch></el-form-item>
-        <el-form-item label="DR"><el-switch v-model="labelForm.dr"></el-switch></el-form-item>
+        <el-form-item label="QUALITY"><el-switch :disabled="readonly" v-model="labelForm.quality"></el-switch></el-form-item>
+        <el-form-item label="DR"><el-switch :disabled="readonly" v-model="labelForm.dr"></el-switch></el-form-item>
 
-        <el-form-item label="STAGE"><el-input v-model="labelForm.stage"></el-input></el-form-item>
+        <el-form-item label="STAGE"><el-input :disabled="readonly" v-model="labelForm.stage"></el-input></el-form-item>
 
-        <el-form-item label="DME"><el-switch v-model="labelForm.dme"></el-switch></el-form-item>
+        <el-form-item label="DME"><el-switch :disabled="readonly" v-model="labelForm.dme"></el-switch></el-form-item>
 
-        <el-form-item label="HR"><el-input v-model="labelForm.hr"></el-input></el-form-item>
-        <el-form-item label="AGE_DME"><el-input v-model="labelForm.age_dme"></el-input></el-form-item>
+        <el-form-item label="HR"><el-input :disabled="readonly" v-model="labelForm.hr"></el-input></el-form-item>
+        <el-form-item label="AGE_DME"><el-input :disabled="readonly" v-model="labelForm.age_dme"></el-input></el-form-item>
 
-        <el-form-item label="RVO"><el-switch v-model="labelForm.rvo"></el-switch></el-form-item>
-        <el-form-item label="CRAO"><el-switch v-model="labelForm.crao"></el-switch></el-form-item>
-        <el-form-item label="MYOPIA"><el-switch v-model="labelForm.myopia"></el-switch></el-form-item>
-        <el-form-item label="OD"><el-switch v-model="labelForm.od"></el-switch></el-form-item>
-        <el-form-item label="GLAUCOMA"><el-switch v-model="labelForm.glaucoma"></el-switch></el-form-item>
-        <el-form-item label="OTHERS"><el-switch v-model="labelForm.others"></el-switch></el-form-item>
+        <el-form-item label="RVO"><el-switch :disabled="readonly" v-model="labelForm.rvo"></el-switch></el-form-item>
+        <el-form-item label="CRAO"><el-switch :disabled="readonly" v-model="labelForm.crao"></el-switch></el-form-item>
+        <el-form-item label="MYOPIA"><el-switch :disabled="readonly" v-model="labelForm.myopia"></el-switch></el-form-item>
+        <el-form-item label="OD"><el-switch :disabled="readonly" v-model="labelForm.od"></el-switch></el-form-item>
+        <el-form-item label="GLAUCOMA"><el-switch :disabled="readonly" v-model="labelForm.glaucoma"></el-switch></el-form-item>
+        <el-form-item label="OTHERS"><el-switch :disabled="readonly" v-model="labelForm.others"></el-switch></el-form-item>
 
-        <el-form-item label="COMMENT"><el-input v-model="labelForm.comment"></el-input></el-form-item>
+        <el-form-item label="COMMENT"><el-input :disabled="readonly" v-model="labelForm.comment"></el-input></el-form-item>
         
 
         <el-form-item>
@@ -56,6 +56,7 @@ export default {
               others: false,
               comment: ''
           },
+          readonly: false,
           hasLabel: false,
           canSubmit: false
       }
@@ -78,6 +79,9 @@ export default {
                 // eslint-disable-next-line
                 console.log(res)
             })
+            if (this.submitId == -1) {
+                this.readonly = true;
+            }
         }
       },
       saveLabelForm() {
