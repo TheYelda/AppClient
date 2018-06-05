@@ -11,7 +11,9 @@
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
             <el-table-column prop="name" label="图片名称"></el-table-column>
             <el-table-column prop="source" label="来源"></el-table-column>
-            <el-table-column prop="state" label="状态">
+            <el-table-column prop="state" label="状态"
+                :filters="stateFilter"
+                :filter-method="filterHandler">
             </el-table-column>
         </el-table>
 
@@ -83,6 +85,19 @@ export default {
   data() {
     return {
       images: [],
+      stateFilter: [{
+          text: '已完成',
+          value: '已完成'
+      }, {
+          text: '有分歧',
+          value: '有分歧'
+      }, {
+          text: '未分配',
+          value: '未分配'
+      }, {
+          text: '进行中',
+          value: '进行中'
+      }],
 
       // upload
       imageUploadUrl: config.apiUrl+'/uploads/medical-images/',
@@ -221,7 +236,10 @@ export default {
         this.$refs.doctorTable.clearSelection();
         this.imageAssignVisible = false
     },
-
+    filterHandler(value, row, column) {
+        const property = column['property'];
+        return row[property] === value;
+    },
     clickImageRow(row) {
         // if (row.state == '未分配') {
         //     return this.$message.error('请先分配任务')

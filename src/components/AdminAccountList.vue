@@ -17,9 +17,16 @@
                 <el-form-item>
                     <el-row><el-col>
                     <el-select v-model="newAuthCode" placeholder="请选择权限" size="small">
-                    <el-option label="医生" value=102></el-option>
+                    <!-- <el-option label="医生" value=102></el-option>
                     <el-option label="客人" value=103></el-option>
-                    <el-option label="无权限" value=100></el-option>
+                    <el-option label="无权限" value=100></el-option> -->
+                    <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    >
+                    </el-option>
                     </el-select>
                     <el-button type="primary" @click="confirmAuthChange" style="margin-left: 10px;" size="small">确 定</el-button>
                     </el-col></el-row>
@@ -43,6 +50,16 @@ export default {
       accounts: [],
       accountAuthVisible: false,
       accountSelection: [],
+      options: [{
+          value: '102',
+          label: '医生'
+      }, {
+          value: '103',
+          label: '客人'
+      }, {
+          value: '100',
+          label: '无权限'
+      }],
       newAuthCode: ''
     }
   },

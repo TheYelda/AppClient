@@ -79,7 +79,7 @@ export default {
     postAccountForm() {
         var data = this.accountForm, id = this.accountForm.account_id
         delete data.account_id
-        this.$http.post(config.apiUrl + '/account/' + id, data).post(res => {
+        this.$http.post(config.apiUrl + '/account/' + id, data).then(res => {
             this.$message.success(res.body.message)
             this.loadInfo()
         }, res => {
