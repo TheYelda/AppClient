@@ -88,8 +88,6 @@ export default {
         })
     },
     logout() {
-        window.localStorage.removeItem('user')
-        this.$emit('pass', 0)
       this.$http.delete(config.apiUrl + '/authorization/').then(res => {
         this.$message.success(res.body.message)
         window.localStorage.removeItem('user')
