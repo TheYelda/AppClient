@@ -1,14 +1,31 @@
 <template>
     <el-row>
         <el-col v-if="jobListVisible">
-        <el-table :data="jobs" stripe @row-click="clickJobRow">
-            <el-table-column type="index" width="55"></el-table-column>
-            <el-table-column prop="job_id" label="任务编号"></el-table-column>
-            <el-table-column prop="image_id" label="图片编号"></el-table-column>
-            <el-table-column prop="label_id" label="标注编号"></el-table-column>
-            <el-table-column prop="state" label="状态"></el-table-column>
-            <el-table-column prop="finished_date" label="完成日期"></el-table-column>
-        </el-table>
+            
+            <el-table :data="curPage" stripe @row-click="clickJobRow">
+                <el-table-column type="index" width="55"></el-table-column>
+                <el-table-column prop="job_id" label="任务编号"></el-table-column>
+                <el-table-column prop="image_id" label="图片编号"></el-table-column>
+                <el-table-column prop="label_id" label="标注编号"></el-table-column>
+                <el-table-column 
+                    prop="job_state" 
+                    label="状态"
+                    :filters="[{text:'未标注', value:'未标注'}, {text:'标注中', value:'标注中'}, {text:'已完成', value:'已完成'}]"
+                    :filter-method="filterHandler"
+                ></el-table-column>
+                <el-table-column prop="finished_date" label="完成日期"></el-table-column>
+            </el-table>
+            <el-col :span="10">
+                <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :page-sizes="[5, 10, 15, 20]"
+                    :page-size="pageSize"
+                    :current-page="curPageNum"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="jobs.length">
+                </el-pagination>
+            </el-col>
         </el-col>
         <el-col v-else>
             <el-row :gutter="20">
@@ -43,12 +60,20 @@ export default {
       jobIndex: 0,
       imageUrl: '',
       labelId: -1,
-      jobId: -1
+      jobId: -1,
+      pageSize: 5,
+      curPage: [],
+      curPageNum: 1,
+      firstIndex: 0,
+      lastIndex: 0
     }
   },
   created() {
     // load data
     this.loadJobs()
+    this.firstIndex = 0
+    this.lastIndex = (this.jobs.length < this.firstIndex + this.pageSize ? this.jobs.length - 1 : this.firstIndex + this.pageSize - 1 )
+    this.refreshCurPage()
   },
   methods: {
     loadJobs() {
@@ -86,6 +111,25 @@ export default {
     setLabelId(id) {
         this.labelId = id
         this.loadJobs()
+    },
+    filterHandler(value, row) {
+        return row.job_state == value
+    },
+    handleSizeChange(size) {
+        this.pageSize = size
+        this.handleCurrentChange(1)
+    },
+    handleCurrentChange(curPageNum) {
+        this.curPageNum = curPageNum
+        this.firstIndex = (this.curPageNum - 1) * this.pageSize
+        this.lastIndex = (this.jobs.length < this.firstIndex + this.pageSize ? this.jobs.length - 1 : this.firstIndex + this.pageSize - 1 )
+        this.refreshCurPage()
+    },
+    refreshCurPage() {
+        this.curPage = []
+        for (var i = this.firstIndex; i <= this.lastIndex; ++i) {
+            this.curPage.push(this.jobs[i])
+        } 
     }
   }
 }
