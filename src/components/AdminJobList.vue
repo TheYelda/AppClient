@@ -1,6 +1,6 @@
 <template>
     <el-row>
-        <el-table :data="jobs" stripe>
+        <el-table :data="getJobs()" stripe>
             <el-table-column type="index" width="55"></el-table-column>
             <el-table-column prop="job_id" label="任务编号"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
@@ -8,6 +8,18 @@
             <el-table-column prop="state" label="状态"></el-table-column>
             <el-table-column prop="finished_date" label="完成日期"></el-table-column>
         </el-table>
+
+        <el-row>
+            <el-pagination
+                @size-change="changeJobPageSize"
+                @current-change="changeJobPageCurrent"
+                :current-page="jobPageCurrent"
+                :page-sizes="jobPageSizes"
+                :page-size="jobPageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="jobs.length">
+            </el-pagination>
+        </el-row>
     </el-row>
 </template>
 
@@ -22,7 +34,11 @@ export default {
 
   data() {
     return {
-      jobs: []
+      jobs: [],
+
+      jobPageCurrent: 1,  // 当前任务列表页码数
+      jobPageSizes: [5, 10, 30, 50],  // 可选任务列表页面最大项目数列表
+      jobPageSize: 10  // 任务列表页面最大项目数
     }
   },
   created() {
@@ -43,6 +59,28 @@ export default {
         // eslint-disable-next-line
         console.log(res)
       });
+    },
+    changeJobPageSize: function (val) {
+        this.jobPageSize = val;
+    },
+    changeJobPageCurrent: function (val) {
+        this.jobPageCurrent = val;
+    },
+    getJobs() {
+        var len = this.jobs.length;
+        if (this.jobPageSize >= len) {
+            return this.jobs;
+        } else {
+            var jobPages = [];
+            for (var i = 0; i < len; i += this.jobPageSize) {
+                if (i + this.jobPageSize >= len) {
+                    jobPages.push(this.jobs.slice(i));
+                } else {
+                    jobPages.push(this.jobs.slice(i, i + this.jobPageSize));
+                }
+            }
+            return jobPages[this.jobPageCurrent - 1];
+        }
     }
   }
 }

@@ -6,7 +6,7 @@
             <el-button type="primary" @click="imageAssign">分配任务</el-button>
             <el-button type="danger" @click="imageDelete" icon="el-icon-delete">删除图像</el-button>
         </div>
-        <el-table ref="imageTable" :data="images" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
+        <el-table ref="imageTable" :data="getImages()" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
             <el-table-column prop="name" label="图片名称"></el-table-column>
@@ -16,6 +16,18 @@
                 :filter-method="filterHandler">
             </el-table-column>
         </el-table>
+
+        <el-row>
+            <el-pagination
+                @size-change="changeImagePageSize"
+                @current-change="changeImagePageCurrent"
+                :current-page="imagePageCurrent"
+                :page-sizes="imagePageSizes"
+                :page-size="imagePageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="images.length">
+            </el-pagination>
+        </el-row>
 
         <el-dialog title="导入图像" :visible.sync="imageUploadVisible" center :show-close="false">
             <el-upload
@@ -118,7 +130,12 @@ export default {
       imageUrl: '',
       imageIndex: 0,
       labelId: -1,
-      imageId: -1
+      imageId: -1,
+
+      // 分页参数
+      imagePageCurrent: 1,  // 当前图像列表页码数
+      imagePageSizes: [5, 10, 30, 50],  // 可选图像列表页面最大项目数列表
+      imagePageSize: 10  // 图像列表页面最大项目数
     }
   },
   created() {
@@ -144,7 +161,28 @@ export default {
             console.log(res)
         })
     },
-
+    changeImagePageSize: function (val) {
+        this.imagePageSize = val;
+    },
+    changeImagePageCurrent: function (val) {
+        this.imagePageCurrent = val;
+    },
+    getImages() {
+        var len = this.images.length;
+        if (this.imagePageSize >= len) {
+            return this.images
+        } else {
+            var imagePages = []
+            for (var i = 0; i < len; i += this.imagePageSize) {
+                if (i + this.imagePageSize >= len) {
+                    imagePages.push(this.images.slice(i))
+                } else {
+                    imagePages.push(this.images.slice(i, i + this.imagePageSize))
+                }
+            }
+            return imagePages[this.imagePageCurrent - 1]
+        }
+    },
     imageUpload() {
         this.imageUploadVisible = true;
     },

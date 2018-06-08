@@ -12,6 +12,18 @@
             <el-table-column prop="email" label="邮箱"></el-table-column>
         </el-table>
 
+        <el-row>
+            <el-pagination
+                @size-change="changeAccountPageSize"
+                @current-change="changeAccountPageCurrent"
+                :current-page="accountPageCurrent"
+                :page-sizes="accountPageSizes"
+                :page-size="accountPageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="accounts.length">
+            </el-pagination>
+        </el-row>
+        
         <el-dialog title="修改权限" :visible.sync="accountAuthVisible" center :show-close="false">
             <el-form>
                 <el-form-item>
@@ -60,7 +72,10 @@ export default {
           value: '100',
           label: '无权限'
       }],
-      newAuthCode: ''
+      newAuthCode: '',
+      accountPageCurrent: 1,  // 当前任务列表页码数
+      accountPageSizes: [5, 10, 30, 50],  // 可选任务列表页面最大项目数列表
+      accountPageSize: 10  // 任务列表页面最大项目数
     }
   },
   created() {
@@ -81,6 +96,28 @@ export default {
         // eslint-disable-next-line
         console.log(res)
       })
+    },
+    changeAccountPageSize: function (val) {
+        this.accountPageSize = val;
+    },
+    changeAccountPageCurrent: function (val) {
+        this.accountPageCurrent = val;
+    },
+    getAccounts() {
+        var len = this.accounts.length;
+        if (this.accountPageSize >= len) {
+            return this.accounts;
+        } else {
+            var accountPages = [];
+            for (var i = 0; i < len; i += this.accountPageSize) {
+                if (i + this.accountPageSize >= len) {
+                    accountPages.push(this.accounts.slice(i));
+                } else {
+                    accountPages.push(this.accounts.slice(i, i + this.accountPageSize));
+                }
+            }
+            return accountPages[this.accountPageCurrent - 1];
+        }
     },
     changeAccountSelection(val) {
         this.accountSelection = val
