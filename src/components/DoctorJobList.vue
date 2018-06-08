@@ -32,6 +32,11 @@
                 <el-col :span="20">
                     <el-button @click="backToJobList">返回</el-button>
                     <AppImage :url="imageUrl"/>
+                    <el-button-group>
+                    <el-button @click="toPreImage" icon="el-icon-arrow-left">上一张</el-button>
+                    <el-button>第 {{ imageIndex+1 }} 张</el-button>
+                    <el-button @click="toNextImage">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+                    </el-button-group>
                 </el-col>
                 <el-col :span="4">
                     <AppLabel :label="labelId" :submitId="jobId" @createLabel="setLabelId"/>
@@ -65,7 +70,8 @@ export default {
       curPage: [],
       curPageNum: 1,
       firstIndex: 0,
-      lastIndex: 0
+      lastIndex: 0,
+      imageIndex: 0
     }
   },
   created() {
@@ -93,6 +99,7 @@ export default {
     },
     clickJobRow(row) {
         this.jobListVisible = false
+        this.imageIndex = getImageIndexByJobId(row.job_id)
         this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.filename
         }, res => {
@@ -130,6 +137,44 @@ export default {
         for (var i = this.firstIndex; i <= this.lastIndex; ++i) {
             this.curPage.push(this.jobs[i])
         } 
+    },
+    toPreImage() {
+        if (this.imageIndex == 0) {
+            this.$message.error("没有上一张了")
+            return
+        }
+
+        this.imageIndex--
+        refreshImageAndLabel(this.imageIndex)
+    },
+    toNextImage() {
+        if (this.imageIndex == jobs.length - 1) {
+            this.$message.error("没有下一张了")
+            return
+        }
+
+        this.imageIndex++
+        refreshImageAndLabel(this.imageIndex)
+    },
+    getImageIndexByJobId(jobId) {
+        for (var i = 0; i < jobs.length; ++i) {
+            if (jobs[i].job_id == jobId) {
+                return i
+            }
+        }
+        return -1
+    },
+    refreshImageAndLabel(index) {
+        this.$http.get(config.apiUrl + '/images/' + this.jobs[index].image_id).then(res => {
+            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.filename
+            if (!this.jobs[index].label_id) {
+                this.labelId = -1
+            }
+            this.jobId = this.jobs[index].job_id
+        }, res => {
+            // eslint-disable-next-line
+            console.log(res)
+        })
     }
   }
 }
