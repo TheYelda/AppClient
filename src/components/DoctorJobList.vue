@@ -145,20 +145,20 @@ export default {
         }
 
         this.imageIndex--
-        refreshImageAndLabel(this.imageIndex)
+        this.refreshImageAndLabel(this.imageIndex)
     },
     toNextImage() {
-        if (this.imageIndex == jobs.length - 1) {
+        if (this.imageIndex == this.jobs.length - 1) {
             this.$message.error("没有下一张了")
             return
         }
 
         this.imageIndex++
-        refreshImageAndLabel(this.imageIndex)
+        this.refreshImageAndLabel(this.imageIndex)
     },
     getImageIndexByJobId(jobId) {
-        for (var i = 0; i < jobs.length; ++i) {
-            if (jobs[i].job_id == jobId) {
+        for (var i = 0; i < this.jobs.length; ++i) {
+            if (this.jobs[i].job_id == jobId) {
                 return i
             }
         }
