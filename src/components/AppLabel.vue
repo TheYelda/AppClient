@@ -61,11 +61,27 @@ export default {
           canSubmit: false
       }
   },
+  watch: {
+    label: function(val) {
+        if (val < 0) {
+            this.hasLabel = false
+            this.resetLabelForm()
+            return
+        }
+
+       this.hasLabel = true
+       this.loadLabel()
+    }
+  },
   created() {
-      if (this.label > 0) {
-          this.hasLabel = true
-          this.loadLabel()
+      if (this.label < 0) {
+          this.hasLabel = false
+          this.resetLabelForm()
+          return
       }
+
+      this.hasLabel = true
+      this.loadLabel()
   },
   methods: {
       loadLabel() {
@@ -140,6 +156,23 @@ export default {
                  })
               }
               this.canSubmit = false
+          }
+      },
+      resetLabelForm() {
+          this.labelForm = {
+              quality: false,
+              dr: false,
+              stage: '',
+              dme: false,
+              hr: '',
+              age_dme: '',
+              rvo: false,
+              crao: false,
+              myopia: false,
+              od: false,
+              glaucoma: false,
+              others: false,
+              comment: ''
           }
       }
   }

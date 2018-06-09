@@ -1,7 +1,6 @@
 <template>
     <el-row>
         <el-col v-if="jobListVisible">
-            
             <el-table :data="curPage" stripe @row-click="clickJobRow">
                 <el-table-column type="index" width="55"></el-table-column>
                 <el-table-column prop="job_id" label="任务编号"></el-table-column>
@@ -64,22 +63,20 @@ export default {
       jobListVisible: true,
       jobIndex: 0,
       imageUrl: '',
-      labelId: -1,
+      labelId: 0,
       jobId: -1,
       pageSize: 5,
       curPage: [],
       curPageNum: 1,
       firstIndex: 0,
       lastIndex: 0,
-      imageIndex: 0
+      imageIndex: 0,
+      noLabel: 0
     }
   },
   created() {
     // load data
     this.loadJobs()
-    this.firstIndex = 0
-    this.lastIndex = (this.jobs.length < this.firstIndex + this.pageSize ? this.jobs.length - 1 : this.firstIndex + this.pageSize - 1 )
-    this.refreshCurPage()
   },
   methods: {
     loadJobs() {
@@ -89,8 +86,11 @@ export default {
         this.jobs = res.body.data;
         var jobStateCode = { '200': '未标注', '201': '标注中', '202': '已完成' }
         for (var i = 0; i < this.jobs.length; i++) {
-            this.jobs[i].state = jobStateCode[this.jobs[i].job_state]
+            this.jobs[i].job_state = jobStateCode[this.jobs[i].job_state]
         }
+        this.firstIndex = 0
+        this.lastIndex = (this.jobs.length < this.firstIndex + this.pageSize ? this.jobs.length - 1 : this.firstIndex + this.pageSize - 1 )
+        this.refreshCurPage()
       }, res => {
         this.$message.error('请求任务信息错误')
         // eslint-disable-next-line
@@ -107,7 +107,8 @@ export default {
             console.log(res)
         })
         if (!row.label_id) {
-            this.labelId = -1
+            this.noLabel--
+            this.labelId = this.noLabel 
         }
         this.jobId = row.job_id
     },
@@ -168,7 +169,10 @@ export default {
         this.$http.get(config.apiUrl + '/images/' + this.jobs[index].image_id).then(res => {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.filename
             if (!this.jobs[index].label_id) {
-                this.labelId = -1
+                this.noLabel--
+                this.labelId = this.noLabel
+            } else {
+                this.labelId = this.jobs[index].label_id
             }
             this.jobId = this.jobs[index].job_id
         }, res => {
