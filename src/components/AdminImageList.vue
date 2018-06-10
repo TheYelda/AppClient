@@ -342,7 +342,12 @@ export default {
             return this.$message.info('当前已经是第一张图像了')
         } else {
             this.imageIndex = this.imageIndex-1
-            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+            if (this.images[this.imageIndex].state == '已完成' || this.images[this.imageIndex].state == '有分歧') {
+                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+            } else {
+                this.imageIndex = this.imageIndex+1  // reset
+                return this.$message.info('上一张图片尚不允许查看')
+            }
         }
     },
     imageNext() {
@@ -350,7 +355,12 @@ export default {
             return this.$message.info('当前已经是最后一张图像了')
         } else {
             this.imageIndex = this.imageIndex+1
-            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+            if (this.images[this.imageIndex].state == '已完成' || this.images[this.imageIndex].state == '有分歧') {
+                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+            } else {
+                this.imageIndex = this.imageIndex-1  // reset
+                return this.$message.info('下一张图片尚不允许查看')
+            }
         }
     },
     setLabelId(id) {
