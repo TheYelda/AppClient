@@ -3,7 +3,17 @@
         <el-form-item label="图片质量"><el-switch :disabled="readonly" v-model="labelForm.quality"></el-switch></el-form-item>
         <el-form-item label="糖尿病视网膜病变"><el-switch :disabled="readonly" v-model="labelForm.dr"></el-switch></el-form-item>
 
-        <el-form-item label="糖尿病视网膜病变阶段"><el-input :disabled="readonly" v-model="labelForm.stage"></el-input></el-form-item>
+        <el-form-item label="糖尿病视网膜病变阶段">
+            <el-select :disabled="readonly" v-model="labelForm.stage" placeholder="请选择">
+                <el-option label="1期" value=1></el-option>
+                <el-option label="2期" value=2></el-option>
+                <el-option label="3期" value=3></el-option>
+                <el-option label="4期" value=4></el-option>
+                <el-option label="5期" value=5></el-option>
+                <el-option label="6期" value=6></el-option>
+                <el-option label="7期" value=7></el-option>
+            </el-select>
+        </el-form-item>
 
         <el-form-item label="黄斑水肿">
             <el-select :disabled="readonly" v-model="labelForm.dme" placeholder="请选择">
@@ -64,7 +74,7 @@ export default {
           labelForm: {
               quality: false,
               dr: false,
-              stage: false,
+              stage: 1,
               dme: 400,
               hr: 500,
               age_dme: 600,
