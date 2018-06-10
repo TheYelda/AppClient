@@ -1,23 +1,43 @@
 <template>
   <el-form :model="labelForm">
-        <el-form-item label="QUALITY"><el-switch :disabled="readonly" v-model="labelForm.quality"></el-switch></el-form-item>
-        <el-form-item label="DR"><el-switch :disabled="readonly" v-model="labelForm.dr"></el-switch></el-form-item>
+        <el-form-item label="图片质量"><el-switch :disabled="readonly" v-model="labelForm.quality"></el-switch></el-form-item>
+        <el-form-item label="糖尿病视网膜病变"><el-switch :disabled="readonly" v-model="labelForm.dr"></el-switch></el-form-item>
 
-        <el-form-item label="STAGE"><el-input :disabled="readonly" v-model="labelForm.stage"></el-input></el-form-item>
+        <el-form-item label="糖尿病视网膜病变阶段"><el-input :disabled="readonly" v-model="labelForm.stage"></el-input></el-form-item>
 
-        <el-form-item label="DME"><el-switch :disabled="readonly" v-model="labelForm.dme"></el-switch></el-form-item>
+        <el-form-item label="黄斑水肿">
+            <el-select :disabled="readonly" v-model="labelForm.dme" placeholder="请选择">
+                <el-option label="没有黄斑水肿" value="400"></el-option>
+                <el-option label="糖尿病黄斑水肿" value="401"></el-option>
+                <el-option label="非糖尿病黄斑水肿" value="401"></el-option>
+            </el-select>
+        </el-form-item>
 
-        <el-form-item label="HR"><el-input :disabled="readonly" v-model="labelForm.hr"></el-input></el-form-item>
-        <el-form-item label="AGE_DME"><el-input :disabled="readonly" v-model="labelForm.age_dme"></el-input></el-form-item>
+        <el-form-item label="高血压视网膜病变">
+            <el-select :disabled="readonly" v-model="labelForm.hr" placeholder="请选择">
+                <el-option label="不患有高血压视网膜病变" value="500"></el-option>
+                <el-option label="轻度高血压视网膜病变" value="501"></el-option>
+                <el-option label="中度高血压视网膜病变" value="502"></el-option>
+                <el-option label="重度高血压视网膜病变" value="503"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="年龄相关性黄斑变性">
+            <el-select :disabled="readonly" v-model="labelForm.age_dme" placeholder="请选择">
+                <el-option label="不患有年龄相关性黄斑变性" value="600"></el-option>
+                <el-option label="早期年龄相关性黄斑变性" value="601"></el-option>
+                <el-option label="中期年龄相关性黄斑变性" value="602"></el-option>
+                <el-option label="晚期年龄相关性黄斑变性" value="603"></el-option>
+            </el-select>
+        </el-form-item>
 
-        <el-form-item label="RVO"><el-switch :disabled="readonly" v-model="labelForm.rvo"></el-switch></el-form-item>
-        <el-form-item label="CRAO"><el-switch :disabled="readonly" v-model="labelForm.crao"></el-switch></el-form-item>
-        <el-form-item label="MYOPIA"><el-switch :disabled="readonly" v-model="labelForm.myopia"></el-switch></el-form-item>
-        <el-form-item label="OD"><el-switch :disabled="readonly" v-model="labelForm.od"></el-switch></el-form-item>
-        <el-form-item label="GLAUCOMA"><el-switch :disabled="readonly" v-model="labelForm.glaucoma"></el-switch></el-form-item>
-        <el-form-item label="OTHERS"><el-switch :disabled="readonly" v-model="labelForm.others"></el-switch></el-form-item>
+        <el-form-item label="视网膜静脉阻塞"><el-switch :disabled="readonly" v-model="labelForm.rvo"></el-switch></el-form-item>
+        <el-form-item label="视网膜动脉阻塞"><el-switch :disabled="readonly" v-model="labelForm.crao"></el-switch></el-form-item>
+        <el-form-item label="病理性近视"><el-switch :disabled="readonly" v-model="labelForm.myopia"></el-switch></el-form-item>
+        <el-form-item label="视盘、视神经疾病"><el-switch :disabled="readonly" v-model="labelForm.od"></el-switch></el-form-item>
+        <el-form-item label="疑似青光眼"><el-switch :disabled="readonly" v-model="labelForm.glaucoma"></el-switch></el-form-item>
+        <el-form-item label="其他疾病"><el-switch :disabled="readonly" v-model="labelForm.others"></el-switch></el-form-item>
 
-        <el-form-item label="COMMENT"><el-input :disabled="readonly" v-model="labelForm.comment"></el-input></el-form-item>
+        <el-form-item label="备注"><el-input :disabled="readonly" v-model="labelForm.comment"></el-input></el-form-item>
         
 
         <el-form-item>
@@ -44,10 +64,10 @@ export default {
           labelForm: {
               quality: false,
               dr: false,
-              stage: '',
+              stage: 400,
               dme: false,
-              hr: '',
-              age_dme: '',
+              hr: 500,
+              age_dme: 600,
               rvo: false,
               crao: false,
               myopia: false,
