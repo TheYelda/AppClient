@@ -1,17 +1,18 @@
 <template>
     <el-row :gutter="20">
         <el-col :span="6">
+            <img :src="photoUrl" class="avatar">
             <el-upload
-                class="avatar-uploader"
                 :action="photoUploadUrl"
                 :show-file-list="false"
                 :auto-upload="true"
+                :limit="1"
                 :on-success="handlePhotoSuccess"
                 :before-upload="beforePhotoUpload">
-                <img v-if="photoUrl" :src="photoUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>    
+            <el-button><i class="el-icon-upload"></i>上传照片</el-button>
             </el-upload>
         </el-col>
+
         <el-col :span="14">
             <el-form :model="accountForm">
                 <el-form-item label="工号">
@@ -122,27 +123,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 20vw;
-    height: 20vw;
-    line-height: 20vw;
-    text-align: center;
-  }
   .avatar {
     width: 20vw;
     height: 20vw;
     display: block;
+    border: 1px dashed #409EFF;
+    border-radius: 6px;
+    cursor: pointer;
   }
 </style>

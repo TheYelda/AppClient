@@ -182,10 +182,10 @@ export default {
           this.labelForm = {
               quality: false,
               dr: false,
-              stage: '',
+              stage: 400,
               dme: false,
-              hr: '',
-              age_dme: '',
+              hr: 500,
+              age_dme: 600,
               rvo: false,
               crao: false,
               myopia: false,
