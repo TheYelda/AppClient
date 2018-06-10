@@ -133,6 +133,7 @@ export default {
         if (this.newAuthCode) {
             for (var i = 0; i < this.accountSelection.length; i++) {
                 var data = this.accountSelection[i]
+                data["authority"] = this.newAuthCode
                 var id = data.account_id
                 delete data.auth
                 delete data.account_id
