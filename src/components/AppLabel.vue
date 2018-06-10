@@ -7,26 +7,26 @@
 
         <el-form-item label="黄斑水肿">
             <el-select :disabled="readonly" v-model="labelForm.dme" placeholder="请选择">
-                <el-option label="没有黄斑水肿" value="400"></el-option>
-                <el-option label="糖尿病黄斑水肿" value="401"></el-option>
-                <el-option label="非糖尿病黄斑水肿" value="401"></el-option>
+                <el-option label="没有黄斑水肿" value=400></el-option>
+                <el-option label="糖尿病黄斑水肿" value=401></el-option>
+                <el-option label="非糖尿病黄斑水肿" value=402></el-option>
             </el-select>
         </el-form-item>
 
         <el-form-item label="高血压视网膜病变">
             <el-select :disabled="readonly" v-model="labelForm.hr" placeholder="请选择">
-                <el-option label="不患有高血压视网膜病变" value="500"></el-option>
-                <el-option label="轻度高血压视网膜病变" value="501"></el-option>
-                <el-option label="中度高血压视网膜病变" value="502"></el-option>
-                <el-option label="重度高血压视网膜病变" value="503"></el-option>
+                <el-option label="不患有高血压视网膜病变" value=500></el-option>
+                <el-option label="轻度高血压视网膜病变" value=501></el-option>
+                <el-option label="中度高血压视网膜病变" value=502></el-option>
+                <el-option label="重度高血压视网膜病变" value=503></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="年龄相关性黄斑变性">
             <el-select :disabled="readonly" v-model="labelForm.age_dme" placeholder="请选择">
-                <el-option label="不患有年龄相关性黄斑变性" value="600"></el-option>
-                <el-option label="早期年龄相关性黄斑变性" value="601"></el-option>
-                <el-option label="中期年龄相关性黄斑变性" value="602"></el-option>
-                <el-option label="晚期年龄相关性黄斑变性" value="603"></el-option>
+                <el-option label="不患有年龄相关性黄斑变性" value=600></el-option>
+                <el-option label="早期年龄相关性黄斑变性" value=601></el-option>
+                <el-option label="中期年龄相关性黄斑变性" value=602></el-option>
+                <el-option label="晚期年龄相关性黄斑变性" value=603></el-option>
             </el-select>
         </el-form-item>
 
@@ -64,8 +64,8 @@ export default {
           labelForm: {
               quality: false,
               dr: false,
-              stage: 400,
-              dme: false,
+              stage: false,
+              dme: 400,
               hr: 500,
               age_dme: 600,
               rvo: false,
