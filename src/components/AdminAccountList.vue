@@ -3,7 +3,7 @@
         <div>
             <el-button type="primary" @click="accountAuthChange">修改权限</el-button>
         </div>
-        <el-table :data="accounts" stripe @selection-change="changeAccountSelection">
+        <el-table :data="getAccounts()" stripe @selection-change="changeAccountSelection">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="account_id" label="工号"></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
