@@ -63,13 +63,13 @@ export default {
       accountAuthVisible: false,
       accountSelection: [],
       options: [{
-          value: '102',
+          value: 102,
           label: '医生'
       }, {
-          value: '103',
+          value: 103,
           label: '客人'
       }, {
-          value: '100',
+          value: 100,
           label: '无权限'
       }],
       newAuthCode: '',
