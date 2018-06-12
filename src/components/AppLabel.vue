@@ -189,6 +189,7 @@ export default {
           } else {
               this.$http.put(config.apiUrl + '/labels/' + this.label, data).then(res => {
                   this.$message.success(res.body.message)
+                  this.loadLabel()
               }, res => {
                   // eslint-disable-next-line
                   console.log(res)

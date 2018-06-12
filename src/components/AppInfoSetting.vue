@@ -55,7 +55,7 @@ export default {
     return {
       accountForm: {},
       photoUrl: '',
-      photoUploadUrl: config.apiUrl + '/uploads/photos/?timestemp=' + new Date().getTime()
+      photoUploadUrl: config.apiUrl + '/uploads/photos/?timestamp=' + new Date().getTime()
     }
   },
   created() {
@@ -70,7 +70,7 @@ export default {
         //   this.$message.success(res.body.message)
           delete res.body.message
           this.accountForm = res.body
-          this.photoUrl = config.apiUrl + '/uploads/photos/' + res.body.photo + '/?timestemp=' + new Date().getTime()
+          this.photoUrl = config.apiUrl + '/uploads/photos/' + res.body.photo + '/?timestamp=' + new Date().getTime()
       }, res => {
           this.$message.error(res.body.message)
           // eslint-disable-next-line
