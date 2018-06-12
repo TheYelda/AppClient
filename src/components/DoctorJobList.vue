@@ -108,7 +108,9 @@ export default {
         })
         if (!row.label_id) {
             this.noLabel--
-            this.labelId = this.noLabel 
+            this.labelId = this.noLabel
+        } else {
+            this.labelId = row.label_id  // set label id
         }
         this.jobId = row.job_id
     },
