@@ -9,6 +9,7 @@
         <el-table ref="imageTable" :data="getImages()" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
+            <el-table-column prop="label_id" label="图片编号"></el-table-column>
             <el-table-column prop="name" label="图片名称"></el-table-column>
             <el-table-column prop="source" label="来源"></el-table-column>
             <el-table-column prop="state" label="状态"
@@ -279,13 +280,15 @@ export default {
         return row[property] === value;
     },
     clickImageRow(row) {
-        // if (row.state == '未分配') {
-        //     return this.$message.error('请先分配任务')
-        // }
+        if (row.state == '未分配') {
+            return this.$message.error('请先分配任务')
+        }
         if (row.state == '有分歧' || row.state == '已完成') {
             this.imageListVisible = false
             var image = this.queryImageById(row.image_id)
             if (image) {
+                if (row.label_id) this.labelId = row.label_id
+                else this.labelId = -1
                 this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
             }
             if (row.state == '已完成') {
@@ -343,6 +346,8 @@ export default {
         } else {
             this.imageIndex = this.imageIndex-1
             if (this.images[this.imageIndex].state == '已完成' || this.images[this.imageIndex].state == '有分歧') {
+                if (this.images[this.imageIndex].label_id) this.labelId = this.images[this.imageIndex].label_id
+                else this.labelId = -1
                 this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
             } else {
                 this.imageIndex = this.imageIndex+1  // reset
@@ -356,6 +361,8 @@ export default {
         } else {
             this.imageIndex = this.imageIndex+1
             if (this.images[this.imageIndex].state == '已完成' || this.images[this.imageIndex].state == '有分歧') {
+                if (this.images[this.imageIndex].label_id) this.labelId = this.images[this.imageIndex].label_id
+                else this.labelId = -1
                 this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
             } else {
                 this.imageIndex = this.imageIndex-1  // reset
@@ -365,7 +372,7 @@ export default {
     },
     setLabelId(id) {
         this.labelId = id
-        this.loadJobs()
+        this.loadImages()
     }
   }
 }

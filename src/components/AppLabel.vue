@@ -89,7 +89,8 @@ export default {
           },
           readonly: false,
           hasLabel: false,
-          canSubmit: false
+          canSubmit: false,
+          isDone: false
       }
   },
   watch: {
@@ -152,9 +153,32 @@ export default {
             if (this.submitId == -1) {
                 this.readonly = true;
             }
+
+            var userInfo = JSON.parse(window.localStorage.getItem('user'))
+            if (userInfo.authority == 101) {
+            this.$http.get(config.apiUrl + '/images/' + this.submitId).then(res => {
+                if (res.body.job_state == 303) {
+                    this.isDone = true
+                }
+                }, res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                })
+            } else if (userInfo.authority == 102) {
+            this.$http.get(config.apiUrl + '/jobs/' + this.submitId).then(res => {
+                    if (res.body.job_state == 202) {
+                        this.isDone = true
+                    }
+                }, res => {
+                    // eslint-disable-next-line
+                    console.log(res)
+                })
+            }
         }
       },
       saveLabelForm() {
+          if (this.isDone) return this.$message.info('已完成的标注无法操作')
+
           // eslint-disable-next-line
           console.log(this.labelForm)
           var data = this.labelForm
@@ -173,6 +197,21 @@ export default {
                   this.$message.success(res.body.message)
                   this.hasLabel = true
                   this.$emit('createLabel', res.body.label_id)
+
+                  // admin
+                  var userInfo = JSON.parse(window.localStorage.getItem('user'))
+                  if (userInfo.authority == 101) {
+                      this.$http.put(config.apiUrl + '/images/' + this.submitId, {
+                     label_id: res.body.label_id,
+                    }).then(res => {
+                        this.$message.success(res.body.message)
+                    }, res => {
+                        // eslint-disable-next-line
+                        console.log(res)
+                    })
+                    return
+                  }
+
                   this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
                      label_id: res.body.label_id,
                      job_state: 201  // 标注中
@@ -198,9 +237,15 @@ export default {
           this.canSubmit = true
       },
       submitLabelForm() {
+          if (this.isDone) return this.$message.info('已完成的标注无法操作')
+
+
           if (!this.hasLabel || !this.canSubmit) {
               this.$message.info('请先保存再提交')
           } else if (this.canSubmit) {
+              this.$message.info('系统自动保存')
+              this.saveLabelForm()  // auto save
+
               var userInfo = JSON.parse(window.localStorage.getItem('user'))
               if (userInfo.authority == 101) {
                  this.$http.put(config.apiUrl + '/images/' + this.submitId, {
@@ -208,6 +253,7 @@ export default {
                      image_state: 303  // 已完成
                  }).then(res => {
                      this.$message.success(res.body.message)
+                     this.loadLabel()
                  }, res => {
                     // eslint-disable-next-line
                     console.log(res)
@@ -218,6 +264,7 @@ export default {
                      job_state: 202  // 已完成
                  }).then(res => {
                      this.$message.success(res.body.message)
+                     this.loadLabel()
                  }, res => {
                     // eslint-disable-next-line
                     console.log(res)
