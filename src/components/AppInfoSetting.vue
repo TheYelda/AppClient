@@ -55,7 +55,7 @@ export default {
     return {
       accountForm: {},
       photoUrl: '',
-      photoUploadUrl: config.apiUrl + '/uploads/photos/?timestamp=' + new Date().getTime()
+      photoUploadUrl: config.apiUrl + '/uploads/photos/'
     }
   },
   created() {
