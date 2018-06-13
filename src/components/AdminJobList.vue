@@ -1,10 +1,11 @@
 <template>
     <el-row>
         <el-table :data="getJobs()" stripe>
-            <el-table-column type="index" width="55"></el-table-column>
+            <!-- <el-table-column type="index" width="55"></el-table-column> -->
             <el-table-column prop="job_id" label="任务编号"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
             <el-table-column prop="label_id" label="标注编号"></el-table-column>
+            <el-table-column prop="nickname" label="医生昵称"></el-table-column>
             <el-table-column prop="state" label="状态"></el-table-column>
             <el-table-column prop="finished_date" label="完成日期"></el-table-column>
         </el-table>
@@ -53,6 +54,19 @@ export default {
         var jobStateCode = { '200': '未标注', '201': '标注中', '202': '已完成' }
         for (var i = 0; i < this.jobs.length; i++) {
             this.jobs[i].state = jobStateCode[this.jobs[i].job_state]
+        }
+      }, res => {
+        this.$message.error('请求任务信息错误')
+        // eslint-disable-next-line
+        console.log(res)
+      });
+      this.$http.get(config.apiUrl + '/accounts/').then(res => {
+        for (var i = 0; i < this.jobs.length; i++) {
+          for (var j = 0; j < res.body.data.length; j++) {
+            if (this.jobs[i].account_id == res.body.data[j].account_id) {
+              this.jobs[i].nickname = res.body.data[j].nickname
+            }
+          }
         }
       }, res => {
         this.$message.error('请求任务信息错误')

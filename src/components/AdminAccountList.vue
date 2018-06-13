@@ -8,7 +8,10 @@
             <el-table-column prop="account_id" label="工号"></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
             <el-table-column prop="nickname" label="昵称"></el-table-column>
-            <el-table-column prop="auth" label="权限身份"></el-table-column>
+            <el-table-column prop="auth" label="权限身份"
+                :filters="authorityFilter"
+                :filter-method="filterHandler">
+            </el-table-column>
             <el-table-column prop="email" label="邮箱"></el-table-column>
         </el-table>
 
@@ -60,6 +63,16 @@ export default {
   data() {
     return {
       accounts: [],
+      authorityFilter: [{
+          text: '医生',
+          value: '医生'
+      }, {
+          text: '客人',
+          value: '客人'
+      }, {
+          text: '无权限',
+          value: '无权限'
+      }],
       accountAuthVisible: false,
       accountSelection: [],
       options: [{
@@ -96,6 +109,10 @@ export default {
         // eslint-disable-next-line
         console.log(res)
       })
+    },
+    filterHandler(value, row, column) {
+        const property = column['property'];
+        return row[property] === value;
     },
     changeAccountPageSize: function (val) {
         this.accountPageSize = val;
@@ -142,7 +159,7 @@ export default {
                     this.loadAccounts()
                 }, res => {
                     // eslint-disable-next-line
-                console.log(res)
+                    console.log(res)
                 })
             }
         }

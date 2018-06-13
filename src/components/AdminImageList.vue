@@ -9,7 +9,7 @@
         <el-table ref="imageTable" :data="getImages()" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
-            <el-table-column prop="label_id" label="图片编号"></el-table-column>
+            <!-- <el-table-column prop="label_id" label="图片编号"></el-table-column> -->
             <el-table-column prop="name" label="图片名称"></el-table-column>
             <el-table-column prop="source" label="来源"></el-table-column>
             <el-table-column prop="state" label="状态"
@@ -55,6 +55,7 @@
                 <el-table-column type="selection" width="55"></el-table-column>        
                 <el-table-column prop="account_id" label="工号"></el-table-column>
                 <el-table-column prop="username" label="账号"></el-table-column>
+                <el-table-column prop="nickname" label="昵称"></el-table-column>
             </el-table>
         </el-dialog>
 
