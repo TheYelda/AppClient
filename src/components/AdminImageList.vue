@@ -123,6 +123,7 @@ export default {
       imageSelection: [],  // also for delete
       doctors: [],
       doctorSelection: [],
+      shadowSelection: [],
 
       // delete
       imageDeleteVisible: false,
@@ -214,6 +215,7 @@ export default {
     },
 
     imageAssign() {
+        console.log(this.imageSelection)
         if (!this.imageSelection.length) {
             this.$message.error('请选择图像再分配任务')
         } else {
@@ -222,14 +224,34 @@ export default {
                     return this.$message.error('请选择未分配的图像')
                 }
             }
+            console.log(this.imageSelection)
             this.imageAssignVisible = true;
+            console.log(this.imageSelection)
             this.loadDoctors()
         }
     },
     changeImageSelection(val) {
         this.imageSelection = val
+        console.log(this.imageSelection)
     },
+    // deep copy
+    copyObj(obj) {
+        let res = {}
+        for (var key in obj) {
+            res[key] = obj[key]
+        }
+        return res
+    },
+    //
     loadDoctors() {
+    console.log(this.imageSelection)
+    this.shadowSelection = []
+    for (var i = 0; i < this.imageSelection.length; i++) {
+        console.log(i)
+        this.shadowSelection.push(this.copyObj(this.imageSelection[i]))
+        console.log(this.shadowSelection)
+    }
+    console.log(this.shadowSelection)
       this.doctors = []
       this.$http.get(config.apiUrl + '/accounts/').then(res => {
         // this.$message.success(res.body.message)
@@ -239,6 +261,7 @@ export default {
                 this.doctors.push(accounts[i])
             }
         }
+        console.log(this.imageSelection)
       }, res => {
         this.$message.error('请求账户信息错误')
         // eslint-disable-next-line
@@ -249,15 +272,19 @@ export default {
         this.doctorSelection = val
     },
     confirmImageAssign() {
+        console.log('start confirm')
         if (this.doctorSelection.length < 2) {
             this.$message.error('必须选择至少两个医生');
         } else {
-            for (var i = 0; i < this.imageSelection.length; ++i) {
+            console.log(this.shadowSelection.length)
+            for (var i = 0; i < this.shadowSelection.length; ++i) {
+                console.log(this.doctorSelection.length)
                 for (var j = 0; j < this.doctorSelection.length; ++j) {
                     var data = {
-                        "image_id": this.imageSelection[i].image_id,
+                        "image_id": this.shadowSelection[i].image_id,
                         "account_id": this.doctorSelection[j].account_id
                     }
+                    console.log(data)
                     this.$http.post(config.apiUrl + '/jobs/', data).then(res => {
                         this.$message.success(res.body.message);
                         this.loadImages();
@@ -310,6 +337,12 @@ export default {
     },
 
     imageDelete() {
+        this.shadowSelection = []
+        for (var i = 0; i < this.imageSelection.length; i++) {
+            console.log(i)
+            this.shadowSelection.push(this.copyObj(this.imageSelection[i]))
+            console.log(this.shadowSelection)
+        }
         if (!this.imageSelection.length) {
             this.$message.error('请选择需要删除的图像')
         } else {
@@ -323,8 +356,8 @@ export default {
     },
     confirmImageDelete() {
         this.imageDeleteVisible = false
-        for (var i = 0; i < this.imageSelection.length; i++) {
-            this.$http.delete(config.apiUrl + '/images/' + this.imageSelection[i].image_id).then(res => {
+        for (var i = 0; i < this.shadowSelection.length; i++) {
+            this.$http.delete(config.apiUrl + '/images/' + this.shadowSelection[i].image_id).then(res => {
                 this.$message.success(res.body.message)
                 this.loadImages();
             }, res => {

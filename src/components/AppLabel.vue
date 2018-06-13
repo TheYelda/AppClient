@@ -73,12 +73,12 @@ export default {
   data() {
       return {
           labelForm: {
-              quality: false,
+              quality: true,
               dr: false,
-              stage: '',
-              dme: '',
-              hr: '',
-              age_dme: '',
+              stage: '700',
+              dme: '400',
+              hr: '500',
+              age_dme: '600',
               rvo: false,
               crao: false,
               myopia: false,
@@ -156,6 +156,10 @@ export default {
 
             var userInfo = JSON.parse(window.localStorage.getItem('user'))
             if (userInfo.authority == 101) {
+                if (this.submitId == -1) {
+                    this.isDone = true
+                    return
+                }
             this.$http.get(config.apiUrl + '/images/' + this.submitId).then(res => {
                 if (res.body.job_state == 303) {
                     this.isDone = true
@@ -275,12 +279,12 @@ export default {
       },
       resetLabelForm() {
           this.labelForm = {
-              quality: false,
+              quality: true,
               dr: false,
-              stage: '',
-              dme: '',
-              hr: '',
-              age_dme: '',
+              stage: '700',
+              dme: '400',
+              hr: '500',
+              age_dme: '600',
               rvo: false,
               crao: false,
               myopia: false,

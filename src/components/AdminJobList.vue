@@ -61,9 +61,13 @@ export default {
         console.log(res)
       });
       this.$http.get(config.apiUrl + '/accounts/').then(res => {
+        console.log(this.jobs.length)
         for (var i = 0; i < this.jobs.length; i++) {
+          console.log(this.jobs[i].account_id)
           for (var j = 0; j < res.body.data.length; j++) {
+            console.log(res.body.data[j].account_id)
             if (this.jobs[i].account_id == res.body.data[j].account_id) {
+              console.log(this.jobs)
               this.jobs[i].nickname = res.body.data[j].nickname
             }
           }

@@ -98,6 +98,7 @@ export default {
       });
     },
     clickJobRow(row) {
+        if (row.job_state == '已完成') return
         this.jobListVisible = false
         this.imageIndex = this.getImageIndexByJobId(row.job_id)
         this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
@@ -146,7 +147,7 @@ export default {
             this.$message.error("没有上一张了")
             return
         }
-
+        if (this.jobs[this.imageIndex-1].job_state == '已完成') return this.$message.error("上一张已完成无法查看")
         this.imageIndex--
         this.refreshImageAndLabel(this.imageIndex)
     },
@@ -155,7 +156,7 @@ export default {
             this.$message.error("没有下一张了")
             return
         }
-
+        if (this.jobs[this.imageIndex+1].job_state == '已完成') return this.$message.error("上一张已完成无法查看")
         this.imageIndex++
         this.refreshImageAndLabel(this.imageIndex)
     },
