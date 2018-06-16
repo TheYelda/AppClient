@@ -36,6 +36,7 @@ export default {
   data() {
     return {
       jobs: [],
+      accounts: [],
 
       jobPageCurrent: 1,  // 当前任务列表页码数
       jobPageSizes: [5, 10, 30, 50],  // 可选任务列表页面最大项目数列表
@@ -44,9 +45,20 @@ export default {
   },
   created() {
     // load data
+    this.loadAccounts()
     this.loadJobs()
   },
   methods: {
+    loadAccounts() {
+      this.$http.get(config.apiUrl + '/accounts/').then(res => {
+        // console.log(res.body.data)
+        this.accounts = res.body.data;
+      }, res => {
+        this.$message.error('请求任务信息错误')
+        // eslint-disable-next-line
+        console.log(res)
+      });
+    },
     loadJobs() {
       this.$http.get(config.apiUrl + '/jobs/').then(res => {  // NEED
         // this.$message.success(res.body.message)
@@ -55,23 +67,14 @@ export default {
         for (var i = 0; i < this.jobs.length; i++) {
             this.jobs[i].state = jobStateCode[this.jobs[i].job_state]
         }
-      }, res => {
-        this.$message.error('请求任务信息错误')
-        // eslint-disable-next-line
-        console.log(res)
-      });
-      this.$http.get(config.apiUrl + '/accounts/').then(res => {
-        console.log(this.jobs.length)
         for (var i = 0; i < this.jobs.length; i++) {
-          console.log(this.jobs[i].account_id)
-          for (var j = 0; j < res.body.data.length; j++) {
-            console.log(res.body.data[j].account_id)
-            if (this.jobs[i].account_id == res.body.data[j].account_id) {
-              console.log(this.jobs)
-              this.jobs[i].nickname = res.body.data[j].nickname
+          for (var j = 0; j < this.accounts.length; j++) {
+            if (this.jobs[i].account_id == this.accounts[j].account_id) {
+              this.jobs[i].nickname = this.accounts[j].nickname
             }
           }
         }
+        console.log(this.jobs)
       }, res => {
         this.$message.error('请求任务信息错误')
         // eslint-disable-next-line
