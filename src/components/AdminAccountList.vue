@@ -98,7 +98,6 @@ export default {
   methods: {
     loadAccounts() {
       this.$http.get(config.apiUrl + '/accounts/').then(res => {
-        // this.$message.success(res.body.message)
         this.accounts = res.body.data
         var accountAuthorityCode = { '100': '无权限', '101': '管理员', '102': '医生', '103': '客人' }
         for (var i = 0; i < this.accounts.length; i++) {

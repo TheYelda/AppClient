@@ -9,7 +9,6 @@
         <el-table ref="imageTable" :data="getImages()" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
-            <!-- <el-table-column prop="label_id" label="图片编号"></el-table-column> -->
             <el-table-column prop="name" label="图片名称"></el-table-column>
             <el-table-column prop="source" label="来源"></el-table-column>
             <el-table-column prop="state" label="状态"
@@ -147,7 +146,6 @@ export default {
   methods: {
     loadImages() {
         this.$http.get(config.apiUrl + '/images/').then(res => {
-            // this.$message.success(res.body.message)
             this.images = res.body.data
             var imagesStateCode = { '300': '未分配', '301': '进行中', '302': '有分歧', '303': '已完成'}
             for (var i = 0; i < this.images.length; i++) {
@@ -156,8 +154,6 @@ export default {
             }
         }, res => {
             if (res.status == 401) {
-                // this.$message.error(res.body.message)
-                // window.localStorage.removeItem('user')
                 this.$emit('pass', 0)
             }
             // eslint-disable-next-line
@@ -202,7 +198,7 @@ export default {
         return isJPGorPNG && isSizeFit;
     },
     successImageUpload(res, file) {
-        this.$message.success(file.name + ' 上传成功')
+        // this.$message.success(file.name + ' 上传成功')
         this.loadImages()
     },
     cancelImageUpload() {
@@ -224,15 +220,12 @@ export default {
                     return this.$message.error('请选择未分配的图像')
                 }
             }
-            console.log(this.imageSelection)
             this.imageAssignVisible = true;
-            console.log(this.imageSelection)
             this.loadDoctors()
         }
     },
     changeImageSelection(val) {
         this.imageSelection = val
-        console.log(this.imageSelection)
     },
     // deep copy
     copyObj(obj) {
@@ -244,24 +237,18 @@ export default {
     },
     //
     loadDoctors() {
-    console.log(this.imageSelection)
     this.shadowSelection = []
     for (var i = 0; i < this.imageSelection.length; i++) {
-        console.log(i)
         this.shadowSelection.push(this.copyObj(this.imageSelection[i]))
-        console.log(this.shadowSelection)
     }
-    console.log(this.shadowSelection)
       this.doctors = []
       this.$http.get(config.apiUrl + '/accounts/').then(res => {
-        // this.$message.success(res.body.message)
         var accounts = res.body.data
         for (var i = 0; i < accounts.length; i++) {
             if (accounts[i].authority == 102) {
                 this.doctors.push(accounts[i])
             }
         }
-        console.log(this.imageSelection)
       }, res => {
         this.$message.error('请求账户信息错误')
         // eslint-disable-next-line
@@ -272,19 +259,15 @@ export default {
         this.doctorSelection = val
     },
     confirmImageAssign() {
-        console.log('start confirm')
         if (this.doctorSelection.length < 2) {
             this.$message.error('必须选择至少两个医生');
         } else {
-            console.log(this.shadowSelection.length)
             for (var i = 0; i < this.shadowSelection.length; ++i) {
-                console.log(this.doctorSelection.length)
                 for (var j = 0; j < this.doctorSelection.length; ++j) {
                     var data = {
                         "image_id": this.shadowSelection[i].image_id,
                         "account_id": this.doctorSelection[j].account_id
                     }
-                    console.log(data)
                     this.$http.post(config.apiUrl + '/jobs/', data).then(res => {
                         this.$message.success(res.body.message);
                         this.loadImages();
@@ -339,9 +322,7 @@ export default {
     imageDelete() {
         this.shadowSelection = []
         for (var i = 0; i < this.imageSelection.length; i++) {
-            console.log(i)
             this.shadowSelection.push(this.copyObj(this.imageSelection[i]))
-            console.log(this.shadowSelection)
         }
         if (!this.imageSelection.length) {
             this.$message.error('请选择需要删除的图像')
