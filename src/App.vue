@@ -32,16 +32,20 @@ export default {
   created() {
     var userInfo = JSON.parse(window.localStorage.getItem('user'))
     if (userInfo) {
-      var authorityCode = [ 100, 101, 102, 103 ]
+      var authorityCode = [ 100, 101, 102, 103, 104 ]
       for (var i = 0; i < authorityCode.length; i++) {
         if (userInfo.authority == authorityCode[i]) {
           this.helloWorld = i;
+          if (userInfo.authorityCode == 104) {
+            this.helloWorld = 2
+          }
         }
       }
     }
   },
   methods: {
     whichPage(code) {
+      if (code == 4) code = 2
       this.helloWorld = code
     },
     isAdmin() {

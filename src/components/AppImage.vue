@@ -89,7 +89,7 @@ export default {
           red: -100,
           green: 0,
           blue: -100
-        }).brightness(first).contrast(second).render()
+        }).greyscale().brightness(first).contrast(second).render()
         var theCanvas = document.getElementById("theCanvas")
         theCanvas.style.height = 'auto'
       })

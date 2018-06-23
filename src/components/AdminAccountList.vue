@@ -1,9 +1,10 @@
 <template>
     <el-row>
+        <el-col v-if="accountListVisible">
         <div>
             <el-button type="primary" @click="accountAuthChange">修改权限</el-button>
         </div>
-        <el-table :data="getAccounts()" stripe @selection-change="changeAccountSelection">
+        <el-table :data="getAccounts()" stripe @selection-change="changeAccountSelection" @row-click="clickAccountRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="account_id" label="工号"></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -32,9 +33,6 @@
                 <el-form-item>
                     <el-row><el-col>
                     <el-select v-model="newAuthCode" placeholder="请选择权限" size="small">
-                    <!-- <el-option label="医生" value=102></el-option>
-                    <el-option label="客人" value=103></el-option>
-                    <el-option label="无权限" value=100></el-option> -->
                     <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -48,6 +46,16 @@
                 </el-form-item>
             </el-form>
         </el-dialog>
+
+        </el-col>
+        <el-col v-else>
+            <el-row>
+                <el-button @click="backToAccountList">返回</el-button>
+                <el-tree :data="accountPerformance" :props="defaultProps" accordion></el-tree>
+            </el-row>
+        </el-col>
+
+
     </el-row>
 </template>
 
@@ -62,7 +70,23 @@ export default {
 
   data() {
     return {
+      accountListVisible: true,
       accounts: [],
+      accountPerformance: [
+          { label: '进度', children: [{label: '任务总数：'}, {label: '未标注：'}, {label: '标注中：'}, {label: '已完成：'}] },
+          { label: '图片质量', children: [{label: '准确率：'}] },
+          { label: '糖尿病视网膜病变', children: [{label: '准确率：'}] },
+          { label: '糖尿病视网膜病变阶段', children: [{label: '准确率：'}] },
+          { label: '黄斑水肿', children: [{label: '准确率：'}] },
+          { label: '高血压视网膜病变', children: [{label: '准确率：'}] },
+          { label: '年龄相关性黄斑变性', children: [{label: '准确率：'}] },
+          { label: '视网膜静脉阻塞', children: [{label: '准确率：'}] },
+          { label: '视网膜动脉阻塞', children: [{label: '准确率：'}] },
+          { label: '病理性近视', children: [{label: '准确率：'}] },
+          { label: '视盘、视神经疾病', children: [{label: '准确率：'}] },
+          { label: '疑似青光眼', children: [{label: '准确率：'}] },
+          { label: '其他疾病', children: [{label: '准确率：'}] }
+      ],
       authorityFilter: [{
           text: '医生',
           value: '医生'
@@ -72,6 +96,9 @@ export default {
       }, {
           text: '无权限',
           value: '无权限'
+      }, {
+          text: '专家',
+          value: '专家'
       }],
       accountAuthVisible: false,
       accountSelection: [],
@@ -84,6 +111,9 @@ export default {
       }, {
           value: 100,
           label: '无权限'
+      }, {
+          value: 104,
+          label: '专家'
       }],
       newAuthCode: '',
       accountPageCurrent: 1,  // 当前任务列表页码数
@@ -99,7 +129,7 @@ export default {
     loadAccounts() {
       this.$http.get(config.apiUrl + '/accounts/').then(res => {
         this.accounts = res.body.data
-        var accountAuthorityCode = { '100': '无权限', '101': '管理员', '102': '医生', '103': '客人' }
+        var accountAuthorityCode = { '100': '无权限', '101': '管理员', '102': '医生', '103': '客人', '104': '专家' }
         for (var i = 0; i < this.accounts.length; i++) {
             this.accounts[i].auth = accountAuthorityCode[this.accounts[i].authority]
         }
@@ -165,6 +195,45 @@ export default {
         this.newAuthCode = ''
         this.accountAuthVisible = false
         this.accountSelection = []
+    },
+    clickAccountRow(row) {
+        var id = row.account_id
+        // request data
+        var data;
+        this.$http.get(config.apiUrl + '/accounts/performance/' + id).then(res => {
+            this.$message.success(res.body.message)
+            data = res.body.data
+            this.accountPerformance[0].children[0].label = this.accountPerformance[0].children[0].label + data.progress.total_jobs.toString()
+            this.accountPerformance[0].children[1].label = this.accountPerformance[0].children[1].label + data.progress.unlabeled_jobs.toString()
+            this.accountPerformance[0].children[2].label = this.accountPerformance[0].children[2].label + data.progress.labeling_jobs.toString()
+            this.accountPerformance[0].children[3].label = this.accountPerformance[0].children[3].label + data.progress.finished_jobs.toString()
+            this.accountPerformance[1].children[0].label = this.accountPerformance[1].children[0].label + data.quality.accuracy.toString()
+            this.accountPerformance[2].children[0].label = this.accountPerformance[2].children[0].label + data.dr.accuracy.toString()
+            this.accountPerformance[3].children[0].label = this.accountPerformance[3].children[0].label + data.stage.accuracy.toString()
+            this.accountPerformance[4].children[0].label = this.accountPerformance[4].children[0].label + data.dme.accuracy.toString()
+            this.accountPerformance[5].children[0].label = this.accountPerformance[5].children[0].label + data.hr.accuracy.toString()
+            this.accountPerformance[6].children[0].label = this.accountPerformance[6].children[0].label + data.age_dme.accuracy.toString()
+            this.accountPerformance[7].children[0].label = this.accountPerformance[7].children[0].label + data.rvo.accuracy.toString()
+            this.accountPerformance[8].children[0].label = this.accountPerformance[8].children[0].label + data.crao.accuracy.toString()
+            this.accountPerformance[9].children[0].label = this.accountPerformance[9].children[0].label + data.myopia.accuracy.toString()
+            this.accountPerformance[10].children[0].label = this.accountPerformance[10].children[0].label + data.od.accuracy.toString()
+            this.accountPerformance[11].children[0].label = this.accountPerformance[11].children[0].label + data.glaucoma.accuracy.toString()
+            this.accountPerformance[12].children[0].label = this.accountPerformance[12].children[0].label + data.others.accuracy.toString()
+            this.accountListVisible = false
+        }, res => {
+            // eslint-disable-next-line
+            console.log(res)
+        })
+    },
+    backToAccountList() {
+        this.accountListVisible = true
+        this.accountPerformance[0].children[0].label = '任务总数：'
+            this.accountPerformance[0].children[1].label = '未标注：'
+            this.accountPerformance[0].children[2].label = '标注中：'
+            this.accountPerformance[0].children[3].label = '已完成：'
+            for (var i = 1; i <= 12; i++) {
+                this.accountPerformance[i].children[0].label = '准确率：'
+            }
     }
   }
 }

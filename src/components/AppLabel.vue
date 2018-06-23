@@ -1,6 +1,11 @@
 <template>
   <el-form :model="labelForm">
-        <el-form-item label="图片质量"><el-switch :disabled="readonly" v-model="labelForm.quality"></el-switch></el-form-item>
+        <el-form-item label="图片质量">
+            <el-select :disabled="readonly" v-model="labelForm.quality" multiple placeholder="请选择">
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
         <el-form-item label="糖尿病视网膜病变"><el-switch :disabled="readonly" v-model="labelForm.dr"></el-switch></el-form-item>
 
         <el-form-item label="糖尿病视网膜病变阶段">
@@ -73,7 +78,7 @@ export default {
   data() {
       return {
           labelForm: {
-              quality: true,
+              quality: ['800'],
               dr: false,
               stage: '700',
               dme: '400',
@@ -90,7 +95,26 @@ export default {
           readonly: false,
           hasLabel: false,
           canSubmit: false,
-          isDone: false
+          isDone: false,
+          options: [{
+              value: '800',
+              label: '可接受'
+          }, {
+              value: '801',
+              label: '曝光问题'
+          }, {
+              value: '802',
+              label: '镜头污迹'
+          }, {
+              value: '803',
+              label: '视野偏差'
+          }, {
+              value: '804',
+              label: '图像失焦'
+          }, {
+              value: '805',
+              label: '其他问题'
+          }]
       }
   },
   watch: {
@@ -122,6 +146,13 @@ export default {
             this.$http.get(config.apiUrl + '/labels/' + this.label).then(res => {
                 this.$message.success(res.body.message)
                 delete res.body.message
+                if (res.body.quality[0] == 0) {
+                    res.body.quality = ''
+                } else {
+                    for (var i = 0; i < res.body.quality.length; i++) {
+                        res.body.quality[i] = res.body.quality[i].toString()
+                    }
+                }
                 if (res.body.stage == 0) {
                     res.body.stage = ''
                 } else {
@@ -186,10 +217,14 @@ export default {
           // eslint-disable-next-line
           console.log(this.labelForm)
           var data = this.labelForm
+          if (data.quality == []) { data.quality = ['0'] }
           if (data.stage == '') { data.stage = '0' }
           if (data.dme == '') { data.dme = '0' }
           if (data.hr == '') { data.hr = '0' }
           if (data.age_dme == '') { data.age_dme = '0' }
+          for (var i = 0; i < data.quality.length; i++) {
+              data.quality[i] = parseInt(data.quality[i])
+          }
           data.stage = parseInt(data.stage)
           data.dme = parseInt(data.dme)
           data.hr = parseInt(data.hr)
@@ -262,7 +297,7 @@ export default {
                     // eslint-disable-next-line
                     console.log(res)
                  })
-              } else if (userInfo.authority == 102) {
+              } else if (userInfo.authority == 102 || userInfo.authority == 104) {
                  this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
                      label_id: this.label,
                      job_state: 202  // 已完成
@@ -279,7 +314,7 @@ export default {
       },
       resetLabelForm() {
           this.labelForm = {
-              quality: true,
+              quality: ['800'],
               dr: false,
               stage: '700',
               dme: '400',

@@ -102,7 +102,7 @@ export default {
         this.jobListVisible = false
         this.imageIndex = this.getImageIndexByJobId(row.job_id)
         this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
-            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.filename
+            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
         }, res => {
             // eslint-disable-next-line
             console.log(res)
@@ -170,7 +170,7 @@ export default {
     },
     refreshImageAndLabel(index) {
         this.$http.get(config.apiUrl + '/images/' + this.jobs[index].image_id).then(res => {
-            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.filename
+            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
             if (!this.jobs[index].label_id) {
                 this.noLabel--
                 this.labelId = this.noLabel

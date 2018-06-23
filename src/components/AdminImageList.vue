@@ -64,6 +64,7 @@
         </el-dialog>
 
         </el-col>
+
         <el-col v-else>
             <el-row :gutter="20">
                 <el-col :span="20">
@@ -75,9 +76,9 @@
                     <el-button @click="imageNext">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
                     </el-button-group>
                 </el-col>
-                <el-col :span="4">
+                <!-- <el-col :span="4">
                     <AppLabel :label="labelId" :submitId="imageId" @createLabel="setLabelId"/>
-                </el-col>
+                </el-col> -->
             </el-row>
         </el-col>
     </el-row>
@@ -136,7 +137,7 @@ export default {
 
       // 分页参数
       imagePageCurrent: 1,  // 当前图像列表页码数
-      imagePageSizes: [5, 10, 30, 50],  // 可选图像列表页面最大项目数列表
+      imagePageSizes: [5, 10, 30, 50, 1000, 2000, 5000],  // 可选图像列表页面最大项目数列表
       imagePageSize: 10  // 图像列表页面最大项目数
     }
   },
@@ -147,7 +148,7 @@ export default {
     loadImages() {
         this.$http.get(config.apiUrl + '/images/').then(res => {
             this.images = res.body.data
-            var imagesStateCode = { '300': '未分配', '301': '进行中', '302': '有分歧', '303': '已完成'}
+            var imagesStateCode = { '300': '未分配', '301': '进行中', '302': '有分歧', '303': '有分歧', '304': '已完成'}
             for (var i = 0; i < this.images.length; i++) {
                 this.images[i].name = this.images[i].filename.split('.')[0]
                 this.images[i].state = imagesStateCode[this.images[i].image_state]
@@ -291,16 +292,14 @@ export default {
         return row[property] === value;
     },
     clickImageRow(row) {
-        if (row.state == '未分配') {
-            return this.$message.error('请先分配任务')
-        }
-        if (row.state == '有分歧' || row.state == '已完成') {
+        var flag = row.state == '有分歧' || row.state == '已完成';
+        if (true) {
             this.imageListVisible = false
             var image = this.queryImageById(row.image_id)
             if (image) {
                 if (row.label_id) this.labelId = row.label_id
                 else this.labelId = -1
-                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.filename
+                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.url
             }
             if (row.state == '已完成') {
                 this.imageId = -1;
@@ -363,7 +362,7 @@ export default {
             if (this.images[this.imageIndex].state == '已完成' || this.images[this.imageIndex].state == '有分歧') {
                 if (this.images[this.imageIndex].label_id) this.labelId = this.images[this.imageIndex].label_id
                 else this.labelId = -1
-                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].url
             } else {
                 this.imageIndex = this.imageIndex+1  // reset
                 return this.$message.info('上一张图片尚不允许查看')

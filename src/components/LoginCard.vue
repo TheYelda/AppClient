@@ -56,7 +56,7 @@ export default {
             window.localStorage.setItem('user', JSON.stringify(res.body))
 
             var authority = res.body.authority
-            var authorityCode = [ 100, 101, 102, 103 ]
+            var authorityCode = [ 100, 101, 102, 103, 104 ]
 
             for (var code = 0; code < authorityCode.length; code++) {
                 if (authority == authorityCode[code]) {

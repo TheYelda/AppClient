@@ -38,7 +38,7 @@ export default {
       accounts: [],
 
       jobPageCurrent: 1,  // 当前任务列表页码数
-      jobPageSizes: [5, 10, 30, 50],  // 可选任务列表页面最大项目数列表
+      jobPageSizes: [5, 10, 30, 50, 1000, 2000, 5000],  // 可选任务列表页面最大项目数列表
       jobPageSize: 10  // 任务列表页面最大项目数
     }
   },
