@@ -67,7 +67,6 @@ export default {
       var userInfo = JSON.parse(window.localStorage.getItem('user'))
       var id = userInfo.account_id
         this.$http.get(config.apiUrl + '/accounts/' + id).then(res => {
-        //   this.$message.success(res.body.message)
           delete res.body.message
           this.accountForm = res.body
           this.photoUrl = config.apiUrl + '/uploads/photos/' + res.body.photo + '/?timestamp=' + new Date().getTime()
@@ -84,6 +83,7 @@ export default {
             this.$message.success(res.body.message)
             this.loadInfo()
         }, res => {
+            this.$message.error(res.body.message)
             // eslint-disable-next-line
             console.log(res)
         })

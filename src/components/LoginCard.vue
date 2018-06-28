@@ -50,9 +50,6 @@ export default {
 
       postLoginForm() {
           this.$http.post(config.apiUrl + '/authorization/', this.loginForm).then(res => {
-            // eslint-disable-next-line
-            console.log(res)
-
             window.localStorage.setItem('user', JSON.stringify(res.body))
 
             var authority = res.body.authority
@@ -60,7 +57,7 @@ export default {
 
             for (var code = 0; code < authorityCode.length; code++) {
                 if (authority == authorityCode[code]) {
-                    if (code == 0) {
+                    if (code == 0 || code == 3) {
                         this.$message.info('请联系管理员获取权限')
                     } else {
                         this.$message.success(res.body.message)

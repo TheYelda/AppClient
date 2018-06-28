@@ -203,22 +203,20 @@ export default {
         this.$http.get(config.apiUrl + '/accounts/performance/' + id).then(res => {
             this.$message.success(res.body.message)
             data = res.body.data
-            this.accountPerformance[0].children[0].label = this.accountPerformance[0].children[0].label + data.progress.total_jobs.toString()
-            this.accountPerformance[0].children[1].label = this.accountPerformance[0].children[1].label + data.progress.unlabeled_jobs.toString()
-            this.accountPerformance[0].children[2].label = this.accountPerformance[0].children[2].label + data.progress.labeling_jobs.toString()
-            this.accountPerformance[0].children[3].label = this.accountPerformance[0].children[3].label + data.progress.finished_jobs.toString()
-            this.accountPerformance[1].children[0].label = this.accountPerformance[1].children[0].label + data.quality.accuracy.toString()
-            this.accountPerformance[2].children[0].label = this.accountPerformance[2].children[0].label + data.dr.accuracy.toString()
-            this.accountPerformance[3].children[0].label = this.accountPerformance[3].children[0].label + data.stage.accuracy.toString()
-            this.accountPerformance[4].children[0].label = this.accountPerformance[4].children[0].label + data.dme.accuracy.toString()
-            this.accountPerformance[5].children[0].label = this.accountPerformance[5].children[0].label + data.hr.accuracy.toString()
-            this.accountPerformance[6].children[0].label = this.accountPerformance[6].children[0].label + data.age_dme.accuracy.toString()
-            this.accountPerformance[7].children[0].label = this.accountPerformance[7].children[0].label + data.rvo.accuracy.toString()
-            this.accountPerformance[8].children[0].label = this.accountPerformance[8].children[0].label + data.crao.accuracy.toString()
-            this.accountPerformance[9].children[0].label = this.accountPerformance[9].children[0].label + data.myopia.accuracy.toString()
-            this.accountPerformance[10].children[0].label = this.accountPerformance[10].children[0].label + data.od.accuracy.toString()
-            this.accountPerformance[11].children[0].label = this.accountPerformance[11].children[0].label + data.glaucoma.accuracy.toString()
-            this.accountPerformance[12].children[0].label = this.accountPerformance[12].children[0].label + data.others.accuracy.toString()
+
+            for (var item in data) {
+                if (item != 'progress') {
+                    var dic = ['progress','quality','dr','stage','dme','hr','age_dme','rvo','crao','myopia','od','glaucoma','others']
+                    var index = dic.indexOf(item)
+                    this.accountPerformance[index].children[0].label = this.accountPerformance[index].children[0].label + data[item].accuracy.toString()
+                } else {
+                    var dic = ['total_jobs', 'unlabeled_jobs', 'labeling_jobs', 'finished_jobs']
+                    for (var i in data.progress) {
+                        var index = dic.indexOf(i)
+                        this.accountPerformance[0].children[index].label = this.accountPerformance[0].children[index].label + data.progress[i].toString()
+                    }
+                }
+            }
             this.accountListVisible = false
         }, res => {
             // eslint-disable-next-line
@@ -228,12 +226,12 @@ export default {
     backToAccountList() {
         this.accountListVisible = true
         this.accountPerformance[0].children[0].label = '任务总数：'
-            this.accountPerformance[0].children[1].label = '未标注：'
-            this.accountPerformance[0].children[2].label = '标注中：'
-            this.accountPerformance[0].children[3].label = '已完成：'
-            for (var i = 1; i <= 12; i++) {
-                this.accountPerformance[i].children[0].label = '准确率：'
-            }
+        this.accountPerformance[0].children[1].label = '未标注：'
+        this.accountPerformance[0].children[2].label = '标注中：'
+        this.accountPerformance[0].children[3].label = '已完成：'
+        for (var i = 1; i <= 12; i++) {
+            this.accountPerformance[i].children[0].label = '准确率：'
+        }
     }
   }
 }

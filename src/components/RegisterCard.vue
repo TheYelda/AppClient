@@ -44,14 +44,12 @@ export default {
       },
       postRegisterForm() {
           this.$http.post(config.apiUrl + '/accounts/', this.registerForm).then(res => {
-            // eslint-disable-next-line
-            console.log(res)
             this.$message.success(res.body.message)
             location.reload()
           }, res => {
+            this.$message.error(res.body.message)
             // eslint-disable-next-line
             console.log(res)
-            this.$message.error(res.body.message)
           })
       },
       switchToLogin() {

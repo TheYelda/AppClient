@@ -328,29 +328,6 @@ export default {
               others: false,
               comment: ''
           }
-      },
-      str2code() {
-        //   var dict = [
-        //       { code: 700, text: '无' },
-        //       { code: 701, text: '1期'},
-        //       { code: 702, text: '2期'},
-        //       { code: 703, text: '3期'},
-        //       { code: 704, text: '4期'},
-        //       { code: 705, text: '5期'},
-        //       { code: 706, text: '6期'},
-        //       { code: 707, text: '7期'},
-        //       { code: 400, text: '没有黄斑水肿'},
-        //       { code: 401, text: '糖尿病黄斑水肿'},
-        //       { code: 402, text: '非糖尿病黄斑水肿'},
-        //       { code: 500, text: '不患有高血压视网膜病变'},
-        //       { code: 501, text: '轻度高血压视网膜病变'},
-        //       { code: 502, text: '中度高血压视网膜病变'},
-        //       { code: 503, text: '重度高血压视网膜病变'},
-        //       { code: 600, text: '不患有年龄相关性黄斑变性'},
-        //       { code: 601, text: '早期年龄相关性黄斑变性'},
-        //       { code: 602, text: '中期年龄相关性黄斑变性'},
-        //       { code: 603, text: '晚期年龄相关性黄斑变性'}
-        //   ]
       }
   }
 }

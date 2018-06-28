@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <div v-if="!helloWorld">
-      <HelloWorld msg="Hello world" @goPage="whichPage"/>
+      <HelloWorld @goPage="whichPage"/>
     </div>
     <div v-else-if="isAdmin()"><AdminPage @logout="whichPage"/></div>
-    <div v-else-if="isDoctor()"><DoctorPage @logout="whichPage"/></div>
+    <div v-else-if="isDoctorOrExpert()"><DoctorPage @logout="whichPage"/></div>
     <div v-else-if="isGuest()"><GuestPage /></div>
   </div>
 </template>
@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      // isAdmin-1, isDoctor-2, isGuest-3
+      // isAdmin-1, isDoctorOrExpert-2or4, isGuest-3
       helloWorld: 0,
     }
   },
@@ -36,23 +36,19 @@ export default {
       for (var i = 0; i < authorityCode.length; i++) {
         if (userInfo.authority == authorityCode[i]) {
           this.helloWorld = i;
-          if (userInfo.authorityCode == 104) {
-            this.helloWorld = 2
-          }
         }
       }
     }
   },
   methods: {
     whichPage(code) {
-      if (code == 4) code = 2
       this.helloWorld = code
     },
     isAdmin() {
       return this.helloWorld == 1
     },
-    isDoctor() {
-      return this.helloWorld == 2
+    isDoctorOrExpert() {
+      return (this.helloWorld == 2 || this.helloWorld == 4)
     },
     isGuest() {
       return this.helloWorld == 3

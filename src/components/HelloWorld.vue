@@ -26,10 +26,6 @@ export default {
     LoginCard,
     RegisterCard
   },
-
-  props: {
-    msg: String
-  },
   data() {
     return {
       isLogin: true

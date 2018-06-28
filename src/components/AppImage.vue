@@ -50,7 +50,6 @@ export default {
             }
           }); 
           this.hasViewr = true
-          console.log('no time to wait')
         }, 1000)
       }
     },
