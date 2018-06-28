@@ -2,32 +2,24 @@
 the front-end dev of theYelda.
 
 What we use:
+
 - vue
-- element & its starter
-
-## Environment
-
-`Node >= 6`
+- element-ui
+- vue-resource
+- CamanJS
+- Viewer.js
 
 ## Start
-
- - Clone or download this repository
- - Enter your local directory, and install dependencies:
-
-``` bash
+```
 npm install
+npm run serve
 ```
-
-## Develop
-
-``` bash
-# serve with hot reload at localhost:8010
-npm run dev
-```
+- Before serve, need to delete or comment the `/vue.config.js`, which is config for build.
 
 ## Build
-
-``` bash
-# build for production with minification
+```
 npm run build
 ```
+- Drag the `/dist/fonts` to `/dist/css` after build, because of the path setting of element-ui.
+
+
