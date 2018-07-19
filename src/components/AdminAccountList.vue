@@ -3,6 +3,7 @@
         <el-col v-if="accountListVisible">
         <div>
             <el-button type="primary" @click="accountAuthChange">修改权限</el-button>
+            <el-button @click="allResultDownload">下载所有</el-button>
         </div>
         <el-table :data="getAccounts()" stripe @selection-change="changeAccountSelection" @row-click="clickAccountRow">
             <el-table-column type="selection" width="55"></el-table-column>
@@ -51,6 +52,7 @@
         <el-col v-else>
             <el-row>
                 <el-button @click="backToAccountList">返回</el-button>
+                <el-button @click="accountResultDownload">下载个人</el-button>
                 <el-tree :data="accountPerformance" :props="defaultProps" accordion></el-tree>
             </el-row>
         </el-col>
@@ -72,6 +74,7 @@ export default {
     return {
       accountListVisible: true,
       accounts: [],
+      accountSelectedId: 0,
       accountPerformance: [
           { label: '进度', children: [{label: '任务总数：'}, {label: '未标注：'}, {label: '标注中：'}, {label: '已完成：'}] },
           { label: '图片质量', children: [{label: '准确率：'}] },
@@ -198,6 +201,7 @@ export default {
     },
     clickAccountRow(row) {
         var id = row.account_id
+        this.accountSelectedId = id
         // request data
         var data;
         this.$http.get(config.apiUrl + '/accounts/performance/' + id).then(res => {
@@ -232,6 +236,36 @@ export default {
         for (var i = 1; i <= 12; i++) {
             this.accountPerformance[i].children[0].label = '准确率：'
         }
+    },
+    allResultDownload() {
+        this.$http.get(config.apiUrl + '/download/?').then(res => {
+            console.log(res)
+            this.download(res.body, 'all.csv')
+        }, res => {
+            this.$message.error(res.body.message)
+            // eslint-disable-next-line
+            console.log(res)
+        })
+    },
+    accountResultDownload() {
+        this.$http.get(config.apiUrl + '/download/?account_id=' + this.accountSelectedId).then(res => {
+            this.download(res.body, this.accountSelectedId + '.csv')
+        }, res => {
+            this.$message.error(res.body.message)
+            // eslint-disable-next-line
+            console.log(res)
+        })
+    },
+    download(data, filename) {
+        if (!data) return
+
+        var url = window.URL.createObjectURL(new Blob([data]))
+        var link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', filename)
+        document.body.appendChild(link)
+        link.click()
     }
   }
 }
