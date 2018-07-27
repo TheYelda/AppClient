@@ -11,13 +11,12 @@
         <el-form-item label="糖尿病视网膜病变阶段">
             <el-select :disabled="readonly" v-model="labelForm.stage" placeholder="请选择">
                 <el-option label="无" value="700"></el-option>
-                <el-option label="1期" value="701"></el-option>
-                <el-option label="2期" value="702"></el-option>
-                <el-option label="3期" value="703"></el-option>
-                <el-option label="4期" value="704"></el-option>
-                <el-option label="5期" value="705"></el-option>
-                <el-option label="6期" value="706"></el-option>
-                <el-option label="7期" value="707"></el-option>
+                <el-option label="I" value="701"></el-option>
+                <el-option label="II" value="702"></el-option>
+                <el-option label="III" value="703"></el-option>
+                <el-option label="IV" value="704"></el-option>
+                <el-option label="V" value="705"></el-option>
+                <el-option label="VI" value="706"></el-option>
             </el-select>
         </el-form-item>
 
@@ -45,9 +44,24 @@
                 <el-option label="晚期年龄相关性黄斑变性" value="603"></el-option>
             </el-select>
         </el-form-item>
+        
+        <el-form-item label="视网膜静脉阻塞">
+            <el-select :disabled="readonly" v-model="labelForm.rvo" placeholder="请选择">
+                <el-option label="无" value="900"></el-option>
+                <el-option label="中央静脉阻塞" value="901"></el-option>
+                <el-option label="半侧中央静脉阻塞" value="902"></el-option>
+                <el-option label="分支静脉阻塞" value="903"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="视网膜动脉阻塞">
+            <el-select :disabled="readonly" v-model="labelForm.crao" placeholder="请选择">
+                <el-option label="无" value="1000"></el-option>
+                <el-option label="中央动脉阻塞" value="1001"></el-option>
+                <el-option label="分支动脉阻塞" value="1002"></el-option>
+                <el-option label="睫状动脉阻塞" value="1003"></el-option>
+            </el-select>
+        </el-form-item>
 
-        <el-form-item label="视网膜静脉阻塞"><el-switch :disabled="readonly" v-model="labelForm.rvo"></el-switch></el-form-item>
-        <el-form-item label="视网膜动脉阻塞"><el-switch :disabled="readonly" v-model="labelForm.crao"></el-switch></el-form-item>
         <el-form-item label="病理性近视"><el-switch :disabled="readonly" v-model="labelForm.myopia"></el-switch></el-form-item>
         <el-form-item label="视盘、视神经疾病"><el-switch :disabled="readonly" v-model="labelForm.od"></el-switch></el-form-item>
         <el-form-item label="疑似青光眼"><el-switch :disabled="readonly" v-model="labelForm.glaucoma"></el-switch></el-form-item>
@@ -84,8 +98,8 @@ export default {
               dme: '400',
               hr: '500',
               age_dme: '600',
-              rvo: false,
-              crao: false,
+              rvo: '900',
+              crao: '1000',
               myopia: false,
               od: false,
               glaucoma: false,
@@ -173,6 +187,18 @@ export default {
                 } else {
                     res.body.age_dme = res.body.age_dme.toString()
                 }
+                // 静脉
+                if (res.body.rvo == 0) {
+                    res.body.rvo = ''
+                } else {
+                    res.body.rvo = res.body.rvo.toString()
+                }
+                // 动脉
+                if (res.body.crao == 0) {
+                    res.body.crao = ''
+                } else {
+                    res.body.crao = res.body.crao.toString()
+                }
                 console.log(res.body)
                 this.labelForm = res.body
                 // eslint-disable-next-line
@@ -217,6 +243,7 @@ export default {
           // eslint-disable-next-line
           console.log(this.labelForm)
           var data = this.labelForm
+
           if (data.quality == []) { data.quality = ['0'] }
           if (data.stage == '') { data.stage = '0' }
           if (data.dme == '') { data.dme = '0' }
@@ -225,10 +252,15 @@ export default {
           for (var i = 0; i < data.quality.length; i++) {
               data.quality[i] = parseInt(data.quality[i])
           }
+          if (data.rvo == '') { data.rvo = '0' }
+          if (data.crao == '') { data.crao = '0' }
+
           data.stage = parseInt(data.stage)
           data.dme = parseInt(data.dme)
           data.hr = parseInt(data.hr)
           data.age_dme = parseInt(data.age_dme)
+          data.rvo = parseInt(data.rvo)
+          data.crao = parseInt(data.crao)
           // eslint-disable-next-line
           console.log(data)
           if (!this.hasLabel) {
@@ -320,8 +352,8 @@ export default {
               dme: '400',
               hr: '500',
               age_dme: '600',
-              rvo: false,
-              crao: false,
+              rvo: '900',
+              crao: '1000',
               myopia: false,
               od: false,
               glaucoma: false,
