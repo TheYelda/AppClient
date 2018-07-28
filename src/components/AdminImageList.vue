@@ -150,7 +150,8 @@ export default {
             this.images = res.body.data
             var imagesStateCode = { '300': '未分配', '301': '进行中', '302': '有分歧', '303': '有分歧', '304': '已完成'}
             for (var i = 0; i < this.images.length; i++) {
-                this.images[i].name = this.images[i].filename.split('.')[0]
+                // this.images[i].name = this.images[i].filename.split('.')[0]
+                this.images[i].name = this.images[i].filename
                 this.images[i].state = imagesStateCode[this.images[i].image_state]
             }
         }, res => {
