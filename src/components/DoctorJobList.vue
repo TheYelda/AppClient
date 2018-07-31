@@ -143,6 +143,7 @@ export default {
         } 
     },
     toPreImage() {
+        // this.loadJobs()
         if (this.imageIndex == 0) {
             this.$message.error("没有上一张了")
             return
@@ -152,11 +153,12 @@ export default {
         this.refreshImageAndLabel(this.imageIndex)
     },
     toNextImage() {
+        // this.loadJobs()
         if (this.imageIndex == this.jobs.length - 1) {
             this.$message.error("没有下一张了")
             return
         }
-        if (this.jobs[this.imageIndex+1].job_state == '已完成') return this.$message.error("上一张已完成无法查看")
+        if (this.jobs[this.imageIndex+1].job_state == '已完成') return this.$message.error("下一张已完成无法查看")
         this.imageIndex++
         this.refreshImageAndLabel(this.imageIndex)
     },
@@ -171,6 +173,8 @@ export default {
     refreshImageAndLabel(index) {
         this.$http.get(config.apiUrl + '/images/' + this.jobs[index].image_id).then(res => {
             this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
+            // console.log(this.jobs[index].label_id)
+            // console.log(this.noLabel)
             if (!this.jobs[index].label_id) {
                 this.noLabel--
                 this.labelId = this.noLabel

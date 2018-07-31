@@ -134,6 +134,8 @@ export default {
   watch: {
     label: function(val) {
         if (val < 0) {
+            // console.log('test: ')
+            this.isDone = false
             this.hasLabel = false
             this.resetLabelForm()
             return
@@ -217,7 +219,7 @@ export default {
                     this.isDone = true
                     return
                 }
-            this.$http.get(config.apiUrl + '/images/' + this.submitId).then(res => {
+                this.$http.get(config.apiUrl + '/images/' + this.submitId).then(res => {
                 if (res.body.job_state == 303) {
                     this.isDone = true
                 }
@@ -226,7 +228,7 @@ export default {
                     console.log(res)
                 })
             } else if (userInfo.authority == 102) {
-            this.$http.get(config.apiUrl + '/jobs/' + this.submitId).then(res => {
+                this.$http.get(config.apiUrl + '/jobs/' + this.submitId).then(res => {
                     if (res.body.job_state == 202) {
                         this.isDone = true
                     }
