@@ -116,6 +116,7 @@ export default {
         this.jobId = row.job_id
     },
     backToJobList() {
+        $("div").remove(".zoomContainer")
         this.jobListVisible = true
         this.loadJobs()
     },
@@ -151,6 +152,7 @@ export default {
         if (this.jobs[this.imageIndex-1].job_state == '已完成') return this.$message.error("上一张已完成无法查看")
         this.imageIndex--
         this.refreshImageAndLabel(this.imageIndex)
+        $("div").remove(".zoomContainer")
     },
     toNextImage() {
         // this.loadJobs()
@@ -161,6 +163,7 @@ export default {
         if (this.jobs[this.imageIndex+1].job_state == '已完成') return this.$message.error("下一张已完成无法查看")
         this.imageIndex++
         this.refreshImageAndLabel(this.imageIndex)
+        $("div").remove(".zoomContainer")
     },
     getImageIndexByJobId(jobId) {
         for (var i = 0; i < this.jobs.length; ++i) {
