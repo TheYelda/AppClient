@@ -352,6 +352,7 @@ export default {
     },
 
     backToImageList() {
+        $("div").remove(".zoomContainer")
         this.imageListVisible = true
         this.loadImages()
     },
@@ -364,6 +365,7 @@ export default {
                 if (this.images[this.imageIndex].label_id) this.labelId = this.images[this.imageIndex].label_id
                 else this.labelId = -1
                 this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].url
+                $("div").remove(".zoomContainer")
             } else {
                 this.imageIndex = this.imageIndex+1  // reset
                 return this.$message.info('上一张图片尚不允许查看')
@@ -379,6 +381,7 @@ export default {
                 if (this.images[this.imageIndex].label_id) this.labelId = this.images[this.imageIndex].label_id
                 else this.labelId = -1
                 this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
+                $("div").remove(".zoomContainer")
             } else {
                 this.imageIndex = this.imageIndex-1  // reset
                 return this.$message.info('下一张图片尚不允许查看')
