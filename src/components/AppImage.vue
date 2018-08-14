@@ -53,14 +53,15 @@ export default {
       document.getElementById("theImage").style.filter = "contrast(" + value + "%)";
     },
     useFilter() {
-      if (!this.base) this.base = this.url
-      this.url = this.base + '?green_channel=true'
+      if (this.url.indexOf('?green_channel=true') == -1) {  // is not
+        this.url = this.url + '?green_channel=true'
+      }
     },
     checkOrigin() {
-      if (!this.base) this.base = this.url
-      this.url = this.base
+      if (this.url.indexOf('?green_channel=true') != -1) {  // has
+        this.url = this.url.split('?')[0]
+      }
     }
-
   }
 }
 
