@@ -5,7 +5,7 @@
             <el-button type="primary" @click="accountAuthChange">修改权限</el-button>
             <el-button @click="allResultDownload">下载所有</el-button>
         </div>
-        <el-table :data="getAccounts()" stripe @selection-change="changeAccountSelection" @row-click="clickAccountRow">
+        <el-table :data="accounts" stripe @selection-change="changeAccountSelection" @row-click="clickAccountRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="account_id" label="工号"></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -17,7 +17,7 @@
             <el-table-column prop="email" label="邮箱"></el-table-column>
         </el-table>
 
-        <el-row>
+        <el-row  style="margin-top: 20px;">
             <el-pagination
                 @size-change="changeAccountPageSize"
                 @current-change="changeAccountPageCurrent"
@@ -25,7 +25,7 @@
                 :page-sizes="accountPageSizes"
                 :page-size="accountPageSize"
                 layout="total, sizes, prev, pager, next, jumper"
-                :total="accounts.length">
+                :total="total">
             </el-pagination>
         </el-row>
         
@@ -74,6 +74,11 @@ export default {
     return {
       accountListVisible: true,
       accounts: [],
+      total: 0,
+      accountPageCurrent: 1,  // 当前任务列表页码数
+      accountPageSizes: [5, 10, 30, 50],  // 可选任务列表页面最大项目数列表
+      accountPageSize: 10,  // 任务列表页面最大项目数
+
       accountSelectedId: 0,
       accountPerformance: [
           { label: '进度', children: [{label: '任务总数：'}, {label: '未标注：'}, {label: '标注中：'}, {label: '已完成：'}] },
@@ -118,23 +123,21 @@ export default {
           value: 104,
           label: '专家'
       }],
-      newAuthCode: '',
-      accountPageCurrent: 1,  // 当前任务列表页码数
-      accountPageSizes: [5, 10, 30, 50],  // 可选任务列表页面最大项目数列表
-      accountPageSize: 10  // 任务列表页面最大项目数
+      newAuthCode: ''
     }
   },
   created() {
-    // load data
     this.loadAccounts()
   },
   methods: {
     loadAccounts() {
-      this.$http.get(config.apiUrl + '/accounts/').then(res => {
+      var offset = (this.accountPageCurrent - 1) * this.accountPageSize
+      this.$http.get(config.apiUrl + '/accounts/' + '?offset=' + offset + '&limit=' + this.accountPageSize).then(res => {
         this.accounts = res.body.data
+        this.total = res.body.total
         var accountAuthorityCode = { '100': '无权限', '101': '管理员', '102': '医生', '103': '客人', '104': '专家' }
         for (var i = 0; i < this.accounts.length; i++) {
-            this.accounts[i].auth = accountAuthorityCode[this.accounts[i].authority]
+          this.accounts[i].auth = accountAuthorityCode[this.accounts[i].authority]
         }
       }, res => {
         this.$message.error('请求账户信息错误')
@@ -142,31 +145,21 @@ export default {
         console.log(res)
       })
     },
+    changeAccountPageSize: function (val) {
+      this.accountPageSize = val
+      if (this.total <= this.accountPageSize * (this.accountPageCurrent - 1)) {  // 容量溢出
+        this.accountPageCurrent = Math.ceil(this.total / this.accountPageSize)
+      }
+      this.loadAccounts()
+    },
+    changeAccountPageCurrent: function (val) {
+        this.accountPageCurrent = val
+        this.loadAccounts()
+    },
+
     filterHandler(value, row, column) {
         const property = column['property'];
         return row[property] === value;
-    },
-    changeAccountPageSize: function (val) {
-        this.accountPageSize = val;
-    },
-    changeAccountPageCurrent: function (val) {
-        this.accountPageCurrent = val;
-    },
-    getAccounts() {
-        var len = this.accounts.length;
-        if (this.accountPageSize >= len) {
-            return this.accounts;
-        } else {
-            var accountPages = [];
-            for (var i = 0; i < len; i += this.accountPageSize) {
-                if (i + this.accountPageSize >= len) {
-                    accountPages.push(this.accounts.slice(i));
-                } else {
-                    accountPages.push(this.accounts.slice(i, i + this.accountPageSize));
-                }
-            }
-            return accountPages[this.accountPageCurrent - 1];
-        }
     },
     changeAccountSelection(val) {
         this.accountSelection = val
