@@ -6,8 +6,7 @@ What we use:
 - vue
 - element-ui
 - vue-resource
-- CamanJS
-- Viewer.js
+- jQuery elevateZoom
 
 ## Start
 ```
