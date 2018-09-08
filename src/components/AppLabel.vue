@@ -121,7 +121,6 @@ export default {
   },
   watch: {
     label: function(val) {
-      console.log('WATCH: the label has changed!')
       if (val < 0) {
         this.isDone = false
         this.hasLabel = false

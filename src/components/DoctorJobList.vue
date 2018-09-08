@@ -101,7 +101,7 @@ export default {
     clickJobRow(row) {
       if (row.job_state == '已完成') return this.$message.info("已完成无法查看")
       this.jobListVisible = false
-      var job = this.queryJobById(row.job_id)  // update jobIndex
+      this.queryJobById(row.job_id)  // just update jobIndex
 
       this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
         this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
@@ -117,12 +117,12 @@ export default {
       }
     },
     backToJobList() {
+      // eslint-disable-next-line
       $("div").remove(".zoomContainer")
       this.jobListVisible = true
       this.loadJobs()
     },
     setLabelId(id) {
-      console.log('After $emit!')
       this.labelId = id
     },
     filterHandler(value, row) {
@@ -173,7 +173,7 @@ export default {
           this.jobIndex++
           if (this.index == this.jobPageSize - 1) this.jobPageCurrent++  // had changed page, need to reset
         }
-        else if (flag = 'next') {
+        else if (flag == 'next') {
           this.$message.error("下一张已完成无法查看")
           this.jobIndex--
           if (this.index == 0) this.jobPageCurrent--  // had changed page, need to reset
@@ -186,6 +186,7 @@ export default {
         this.jobId = this.jobs[index].job_id
         if (this.jobs[index].label_id) this.labelId = this.jobs[index].label_id  // has label
         else this.labelId = -1
+        // eslint-disable-next-line
         $("div").remove(".zoomContainer")
       }
     },
