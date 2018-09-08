@@ -5,7 +5,7 @@
                 <el-table-column prop="job_id" label="任务编号"></el-table-column>
                 <el-table-column prop="image_id" label="图片编号"></el-table-column>
                 <el-table-column prop="label_id" label="标注编号"></el-table-column>
-                <!-- <el-table-column prop="nickname" label="医生昵称"></el-table-column> -->
+                <el-table-column prop="nickname" label="医生昵称"></el-table-column>
                 <el-table-column prop="state" label="状态"></el-table-column>
                 <el-table-column prop="finished_date" label="完成日期"></el-table-column>
             </el-table>

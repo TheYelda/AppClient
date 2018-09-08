@@ -2,7 +2,7 @@
     <el-row :gutter="20">
         <el-col :span="6">
             <img :src="photoUrl" class="avatar">
-            <el-upload
+            <el-upload  style="margin-top: 20px;"
                 :action="photoUploadUrl"
                 :show-file-list="false"
                 :auto-upload="true"
@@ -16,26 +16,26 @@
         <el-col :span="14">
             <el-form :model="accountForm">
                 <el-form-item label="工号">
-                    <el-input v-model="accountForm.account_id" :disabled="true" :placeholder="accountForm.account_id"></el-input>
+                  <el-input v-model="accountForm.account_id" :disabled="true" :placeholder="accountForm.account_id"></el-input>
                 </el-form-item>
                 <el-form-item label="用户名">
-                    <el-input v-model="accountForm.username" :disabled="true" :placeholder="accountForm.username"></el-input>
+                  <el-input v-model="accountForm.username" :disabled="true" :placeholder="accountForm.username"></el-input>
                 </el-form-item>
                 <el-form-item label="昵称">
-                    <el-input v-model="accountForm.nickname" :disabled="true" :placeholder="accountForm.nickname"></el-input>
+                  <el-input v-model="accountForm.nickname" :disabled="true" :placeholder="accountForm.nickname"></el-input>
                 </el-form-item>
                 <el-form-item label="权限">
-                    <el-input v-model="accountForm.authority" :disabled="true" :placeholder="accountForm.authority"></el-input>
+                  <el-input v-model="accountForm.authority" :disabled="true" :placeholder="accountForm.authority"></el-input>
                 </el-form-item>
                 <el-form-item label="邮件">
-                    <el-input v-model="accountForm.email"></el-input>
+                  <el-input v-model="accountForm.email"></el-input>
                 </el-form-item>
                 <el-form-item label="密码">
-                    <el-input v-model="accountForm.password"></el-input>
+                  <el-input v-model="accountForm.password"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button @click="postAccountForm">修改账户信息</el-button>
-                    <el-button type="primary" @click="logout">登出</el-button>
+                  <el-button @click="postAccountForm">修改账户信息</el-button>
+                  <el-button type="primary" @click="logout">登出</el-button>
                 </el-form-item>
             </el-form>
         </el-col>

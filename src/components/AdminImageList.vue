@@ -6,10 +6,10 @@
             <el-button type="primary" @click="imageAssign">分配任务</el-button>
             <el-button type="danger" @click="imageDelete" icon="el-icon-delete">删除图像</el-button>
         </div>
-        <el-table ref="imageTable" :data="getImages()" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
+        <el-table ref="imageTable" :data="images" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
-            <el-table-column prop="name" label="图片名称"></el-table-column>
+            <el-table-column prop="filename" label="图片名称"></el-table-column>
             <el-table-column prop="source" label="来源"></el-table-column>
             <el-table-column prop="state" label="状态"
                 :filters="stateFilter"
@@ -17,7 +17,7 @@
             </el-table-column>
         </el-table>
 
-        <el-row>
+        <el-row style="margin-top: 20px;">
             <el-pagination
                 @size-change="changeImagePageSize"
                 @current-change="changeImagePageCurrent"
@@ -25,7 +25,7 @@
                 :page-sizes="imagePageSizes"
                 :page-size="imagePageSize"
                 layout="total, sizes, prev, pager, next, jumper"
-                :total="images.length">
+                :total="total">
             </el-pagination>
         </el-row>
 
@@ -76,9 +76,6 @@
                     <el-button @click="imageNext">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
                     </el-button-group>
                 </el-col>
-                <!-- <el-col :span="4">
-                    <AppLabel :label="labelId" :submitId="imageId" @createLabel="setLabelId"/>
-                </el-col> -->
             </el-row>
         </el-col>
     </el-row>
@@ -99,6 +96,8 @@ export default {
   data() {
     return {
       images: [],
+      total: 0,
+
       stateFilter: [{
           text: '已完成',
           value: '已完成'
@@ -131,7 +130,7 @@ export default {
       // info
       imageListVisible: true,
       imageUrl: '',
-      imageIndex: 0,
+      imageIndex: -1,
       labelId: -1,
       imageId: -1,
 
@@ -145,111 +144,94 @@ export default {
     this.loadImages()
   },
   methods: {
-    loadImages() {
-        this.$http.get(config.apiUrl + '/images/').then(res => {
-            this.images = res.body.data
-            var imagesStateCode = { '300': '未分配', '301': '进行中', '302': '有分歧', '303': '有分歧', '304': '已完成'}
-            for (var i = 0; i < this.images.length; i++) {
-                // this.images[i].name = this.images[i].filename.split('.')[0]
-                this.images[i].name = this.images[i].filename
-                this.images[i].state = imagesStateCode[this.images[i].image_state]
-            }
-        }, res => {
-            if (res.status == 401) {
-                this.$emit('pass', 0)
-            }
-            // eslint-disable-next-line
-            console.log(res)
-        })
+    loadImages(needCallback) {
+      var offset = (this.imagePageCurrent - 1) * this.imagePageSize
+      this.$http.get(config.apiUrl + '/images/' + '?offset=' + offset + '&limit=' + this.imagePageSize).then(res => {
+        this.images = res.body.data
+        this.total = res.body.total
+        var imagesStateCode = { '300': '未分配', '301': '进行中', '302': '有分歧', '303': '有分歧', '304': '已完成'}
+        for (var i = 0; i < this.images.length; i++) {
+          this.images[i].state = imagesStateCode[this.images[i].image_state]
+        }
+        if (needCallback) this.changeImageUrl()  // callback
+      }, res => {
+        if (res.status == 401) {
+          this.$emit('pass', 0)
+        }
+        this.$message.error('请求图像信息错误')
+        // eslint-disable-next-line
+        console.log(res)
+      })
     },
     changeImagePageSize: function (val) {
-        this.imagePageSize = val;
+      this.imagePageSize = val
+      if (this.total <= this.imagePageSize * (this.imagePageCurrent - 1)) {  // 容量溢出
+        this.imagePageCurrent = Math.ceil(this.total / this.imagePageSize)
+      }
+      this.loadImages()
     },
     changeImagePageCurrent: function (val) {
-        this.imagePageCurrent = val;
-    },
-    getImages() {
-        var len = this.images.length;
-        if (this.imagePageSize >= len) {
-            return this.images
-        } else {
-            var imagePages = []
-            for (var i = 0; i < len; i += this.imagePageSize) {
-                if (i + this.imagePageSize >= len) {
-                    imagePages.push(this.images.slice(i))
-                } else {
-                    imagePages.push(this.images.slice(i, i + this.imagePageSize))
-                }
-            }
-            return imagePages[this.imagePageCurrent - 1]
-        }
+      this.imagePageCurrent = val
+      this.loadImages()
     },
     imageUpload() {
-        this.imageUploadVisible = true;
+      this.imageUploadVisible = true;
     },
     beforeImageUpload(file) {
-        var isJPGorPNG = (file.type === 'image/jpeg' || file.type === 'image/png');
-        var isSizeFit = file.size / 1024 / 1024 < 5;
+      var isJPGorPNG = (file.type === 'image/jpeg' || file.type === 'image/png')
+      var isSizeFit = file.size / 1024 / 1024 < 5
 
-        if (!isJPGorPNG) {
-            this.$message.error('图片只能是 JPG 或 PNG 格式!');
-        }
-        if (!isSizeFit) {
-            this.$message.error('图片大小不能超过 5MB!');
-        }
-        return isJPGorPNG && isSizeFit;
+      if (!isJPGorPNG) this.$message.error('图片只能是 JPG 或 PNG 格式!')
+      if (!isSizeFit) this.$message.error('图片大小不能超过 5MB!')
+      return isJPGorPNG && isSizeFit;
     },
-    successImageUpload(res, file) {
-        // this.$message.success(file.name + ' 上传成功')
-        this.loadImages()
+    successImageUpload() {
+      this.loadImages()
     },
     cancelImageUpload() {
-        this.imageUploadVisible = false
-        this.$refs.upload.abort()
-        this.$refs.upload.clearFiles()
+      this.imageUploadVisible = false
+      this.$refs.upload.abort()
+      this.$refs.upload.clearFiles()
     },
     submitImageUpload() {
-        this.$refs.upload.submit();
+      this.$refs.upload.submit()
     },
 
     imageAssign() {
-        console.log(this.imageSelection)
-        if (!this.imageSelection.length) {
-            this.$message.error('请选择图像再分配任务')
-        } else {
-            for (var i = 0; i < this.imageSelection.length; i++) {
-                if (this.imageSelection[i].state != '未分配') {
-                    return this.$message.error('请选择未分配的图像')
-                }
-            }
-            this.imageAssignVisible = true;
-            this.loadDoctors()
+      if (!this.imageSelection.length) {
+        this.$message.error('请选择图像再分配任务')
+      } else {
+        for (var i = 0; i < this.imageSelection.length; i++) {
+          if (this.imageSelection[i].state != '未分配') {
+            return this.$message.error('请选择未分配的图像')
+          }
         }
+        this.imageAssignVisible = true;
+        this.loadDoctors()
+      }
     },
     changeImageSelection(val) {
         this.imageSelection = val
     },
     // deep copy
     copyObj(obj) {
-        let res = {}
-        for (var key in obj) {
-            res[key] = obj[key]
-        }
-        return res
+      var res = {}
+      for (var key in obj) res[key] = obj[key]
+      return res
     },
     //
     loadDoctors() {
-    this.shadowSelection = []
-    for (var i = 0; i < this.imageSelection.length; i++) {
+      this.shadowSelection = []
+      for (var i = 0; i < this.imageSelection.length; i++) {
         this.shadowSelection.push(this.copyObj(this.imageSelection[i]))
-    }
+      }
       this.doctors = []
       this.$http.get(config.apiUrl + '/accounts/').then(res => {
         var accounts = res.body.data
         for (var i = 0; i < accounts.length; i++) {
-            if (accounts[i].authority == 102) {
-                this.doctors.push(accounts[i])
-            }
+          if (accounts[i].authority == 102) {
+            this.doctors.push(accounts[i])
+          }
         }
       }, res => {
         this.$message.error('请求账户信息错误')
@@ -293,59 +275,56 @@ export default {
         return row[property] === value;
     },
     clickImageRow(row) {
-        var flag = row.state == '有分歧' || row.state == '已完成';
-        if (true) {
-            this.imageListVisible = false
-            var image = this.queryImageById(row.image_id)
-            if (image) {
-                if (row.label_id) this.labelId = row.label_id
-                else this.labelId = -1
-                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.url
-            }
-            if (row.state == '已完成') {
-                this.imageId = -1;
-            } else {
-                this.imageId = row.image_id  // trick name
-            }
-        }
+      this.imageListVisible = false
+      var image = this.queryImageById(row.image_id)
+      if (image) {
+        if (row.label_id) this.labelId = row.label_id
+        else this.labelId = -1
+        this.imageUrl = config.apiUrl + '/uploads/medical-images/' + image.url
+      }
+      if (row.state == '已完成') {
+        this.imageId = -1
+      } else {
+        this.imageId = row.image_id  // trick name
+      }
     },
     queryImageById(id) {
-        for (var i = 0; i < this.images.length; ++i) {
-            if (this.images[i].image_id === id) {
-                this.imageIndex = i
-                return this.images[i]
-            }
+      for (var i = 0; i < this.images.length; ++i) {
+        if (this.images[i].image_id === id) {
+          this.imageIndex = this.imagePageSize * (this.imagePageCurrent - 1) + i
+          return this.images[i]
         }
-        return null
+      }
+      return null
     },
 
     imageDelete() {
-        this.shadowSelection = []
+      this.shadowSelection = []
+      for (var i = 0; i < this.imageSelection.length; i++) {
+        this.shadowSelection.push(this.copyObj(this.imageSelection[i]))
+      }
+      if (!this.imageSelection.length) {
+        this.$message.error('请选择需要删除的图像')
+      } else {
         for (var i = 0; i < this.imageSelection.length; i++) {
-            this.shadowSelection.push(this.copyObj(this.imageSelection[i]))
+          if (this.imageSelection[i].state != '未分配') {
+            return this.$message.error('只能删除未分配的图像')
+          }
         }
-        if (!this.imageSelection.length) {
-            this.$message.error('请选择需要删除的图像')
-        } else {
-            for (var i = 0; i < this.imageSelection.length; i++) {
-                if (this.imageSelection[i].state != '未分配') {
-                    return this.$message.error('只能删除未分配的图像')
-                }
-            }
-            this.imageDeleteVisible = true
-        }
+        this.imageDeleteVisible = true
+      }
     },
     confirmImageDelete() {
-        this.imageDeleteVisible = false
-        for (var i = 0; i < this.shadowSelection.length; i++) {
-            this.$http.delete(config.apiUrl + '/images/' + this.shadowSelection[i].image_id).then(res => {
-                this.$message.success(res.body.message)
-                this.loadImages();
-            }, res => {
-                // eslint-disable-next-line
-                console.log(res);
-            })
-        }
+      for (var i = 0; i < this.shadowSelection.length; i++) {
+        this.$http.delete(config.apiUrl + '/images/' + this.shadowSelection[i].image_id).then(res => {
+          this.imageDeleteVisible = false
+          this.$message.success(res.body.message)
+          this.loadImages()
+        }, res => {
+          // eslint-disable-next-line
+          console.log(res)
+        })
+      }
     },
     cancelImageDelete() {
         this.imageDeleteVisible = false
@@ -357,45 +336,36 @@ export default {
         this.loadImages()
     },
     imagePrevious() {
-        if (this.imageIndex == 0) {
-            return this.$message.info('当前已经是第一张图像了')
+      if (this.imageIndex == 0) {
+        return this.$message.info('当前已经是第一张图像了')
+      } else {
+        this.imageIndex--
+        if ((this.imageIndex + 1) <= (this.imagePageCurrent - 1) * this.imagePageSize) {
+          this.imagePageCurrent--  // prev page
+          this.loadImages('needCallback')
         } else {
-            this.imageIndex = this.imageIndex-1
-            if (this.images[this.imageIndex].state == '已完成' || this.images[this.imageIndex].state == '有分歧') {
-                if (this.images[this.imageIndex].label_id) this.labelId = this.images[this.imageIndex].label_id
-                else this.labelId = -1
-                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].url
-                $("div").remove(".zoomContainer")
-            } else {
-                this.imageIndex = this.imageIndex+1  // reset
-                return this.$message.info('上一张图片尚不允许查看')
-            }
+          this.changeImageUrl()
         }
+      }
     },
     imageNext() {
-        if (this.imageIndex == this.images.length-1) {
-            return this.$message.info('当前已经是最后一张图像了')
+      if (this.imageIndex == this.total-1) {
+        return this.$message.info('当前已经是最后一张图像了')
+      } else {
+        this.imageIndex++
+        if ((this.imageIndex + 1) > this.imagePageCurrent * this.imagePageSize) {
+          this.imagePageCurrent++  // next page
+          this.loadImages('needCallback')
         } else {
-            this.imageIndex = this.imageIndex+1
-            if (this.images[this.imageIndex].state == '已完成' || this.images[this.imageIndex].state == '有分歧') {
-                if (this.images[this.imageIndex].label_id) this.labelId = this.images[this.imageIndex].label_id
-                else this.labelId = -1
-                this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[this.imageIndex].filename
-                $("div").remove(".zoomContainer")
-            } else {
-                this.imageIndex = this.imageIndex-1  // reset
-                return this.$message.info('下一张图片尚不允许查看')
-            }
+          this.changeImageUrl()
         }
+      }
     },
-    setLabelId(id) {
-        this.labelId = id
-        this.loadImages()
+    changeImageUrl() {
+      var index = this.imageIndex % this.imagePageSize  // index in the subset
+      this.imageUrl = config.apiUrl + '/uploads/medical-images/' + this.images[index].url
+      $("div").remove(".zoomContainer")
     }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

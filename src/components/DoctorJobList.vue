@@ -1,7 +1,7 @@
 <template>
     <el-row>
         <el-col v-if="jobListVisible">
-            <el-table :data="curPage" stripe @row-click="clickJobRow">
+            <el-table :data="jobs" stripe @row-click="clickJobRow">
                 <el-table-column type="index" width="55"></el-table-column>
                 <el-table-column prop="job_id" label="任务编号"></el-table-column>
                 <el-table-column prop="image_id" label="图片编号"></el-table-column>
@@ -14,17 +14,17 @@
                 ></el-table-column>
                 <el-table-column prop="finished_date" label="完成日期"></el-table-column>
             </el-table>
-            <el-col :span="10">
+            <el-row style="margin-top: 20px;">
                 <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :page-sizes="[5, 10, 15, 20]"
-                    :page-size="pageSize"
-                    :current-page="curPageNum"
+                    @size-change="changeJobPageSize"
+                    @current-change="changeJobPageCurrent"
+                    :page-sizes="jobPageSizes"
+                    :page-size="jobPageSize"
+                    :current-page="jobPageCurrent"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="jobs.length">
+                    :total="total">
                 </el-pagination>
-            </el-col>
+            </el-row>
         </el-col>
         <el-col v-else>
             <el-row :gutter="20">
@@ -33,12 +33,12 @@
                     <AppImage :url="imageUrl"/>
                     <el-button-group>
                     <el-button @click="toPreImage" icon="el-icon-arrow-left">上一张</el-button>
-                    <el-button>第 {{ imageIndex+1 }} 张</el-button>
+                    <el-button>第 {{ jobIndex+1 }} 张</el-button>
                     <el-button @click="toNextImage">下一张<i class="el-icon-arrow-right el-icon--right"></i></el-button>
                     </el-button-group>
                 </el-col>
                 <el-col :span="4">
-                    <AppLabel :label="labelId" :submitId="jobId" @createLabel="setLabelId"/>
+                    <AppLabel :label="labelId" :submitId="jobId" @createLabel="setLabelId" @nextImage="toNextImage"/>
                 </el-col>
             </el-row>
         </el-col>
@@ -59,38 +59,39 @@ export default {
 
   data() {
     return {
+      accountId: -1,
       jobs: [],
+      total: 0,
+
+      // info
       jobListVisible: true,
-      jobIndex: 0,
       imageUrl: '',
-      labelId: 0,
+      jobIndex: -1,
       jobId: -1,
-      pageSize: 5,
-      curPage: [],
-      curPageNum: 1,
-      firstIndex: 0,
-      lastIndex: 0,
-      imageIndex: 0,
-      noLabel: 0
+      labelId: -1,  // no label
+
+      // 分页参数
+      jobPageCurrent: 1,  // 页码数
+      jobPageSizes: [5, 10, 30, 50, 1000, 2000, 5000],  // 可选最大项目数列表
+      jobPageSize: 10  // 最大项目数
     }
   },
   created() {
-    // load data
     this.loadJobs()
   },
   methods: {
-    loadJobs() {
-      var userInfo = JSON.parse(window.localStorage.getItem('user'))
-      this.$http.get(config.apiUrl + '/jobs/?account_id=' + userInfo.account_id).then(res => {  // NEED
-        // this.$message.success(res.body.message)
-        this.jobs = res.body.data;
+    loadJobs(needCallback) {
+      var offset = (this.jobPageCurrent - 1) * this.jobPageSize
+      var id = JSON.parse(window.localStorage.getItem('user')).account_id
+      this.$http.get(config.apiUrl + '/jobs/?account_id=' + id + '&offset=' + offset + '&limit=' + this.jobPageSize).then(res => {
+        this.jobs = res.body.data
+        this.total = res.body.total
         var jobStateCode = { '200': '未标注', '201': '标注中', '202': '已完成' }
         for (var i = 0; i < this.jobs.length; i++) {
             this.jobs[i].job_state = jobStateCode[this.jobs[i].job_state]
         }
-        this.firstIndex = 0
-        this.lastIndex = (this.jobs.length < this.firstIndex + this.pageSize ? this.jobs.length - 1 : this.firstIndex + this.pageSize - 1 )
-        this.refreshCurPage()
+        if (needCallback == 'prev') this.changeImageAndLabel('prev')
+        else if (needCallback == 'next') this.changeImageAndLabel('next')
       }, res => {
         this.$message.error('请求任务信息错误')
         // eslint-disable-next-line
@@ -98,102 +99,105 @@ export default {
       });
     },
     clickJobRow(row) {
-        if (row.job_state == '已完成') return
-        this.jobListVisible = false
-        this.imageIndex = this.getImageIndexByJobId(row.job_id)
-        this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
-            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
-        }, res => {
-            // eslint-disable-next-line
-            console.log(res)
-        })
-        if (!row.label_id) {
-            this.noLabel--
-            this.labelId = this.noLabel
-        } else {
-            this.labelId = row.label_id  // set label id
-        }
-        this.jobId = row.job_id
+      if (row.job_state == '已完成') return this.$message.info("已完成无法查看")
+      this.jobListVisible = false
+      var job = this.queryJobById(row.job_id)  // update jobIndex
+
+      this.$http.get(config.apiUrl + '/images/' + row.image_id).then(res => {
+        this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
+      }, res => {
+        // eslint-disable-next-line
+        console.log(res)
+      })
+      this.jobId = row.job_id
+      if (!row.label_id) {
+        this.labelId = -1
+      } else {
+        this.labelId = row.label_id  // set label id
+      }
     },
     backToJobList() {
-        $("div").remove(".zoomContainer")
-        this.jobListVisible = true
-        this.loadJobs()
+      $("div").remove(".zoomContainer")
+      this.jobListVisible = true
+      this.loadJobs()
     },
     setLabelId(id) {
-        this.labelId = id
-        this.loadJobs()
+      console.log('After $emit!')
+      this.labelId = id
     },
     filterHandler(value, row) {
-        return row.job_state == value
+      return row.job_state == value
     },
-    handleSizeChange(size) {
-        this.pageSize = size
-        this.handleCurrentChange(1)
+    changeJobPageSize(val) {
+      this.jobPageSize = val
+      if (this.total <= this.jobPageSize * (this.jobPageCurrent - 1)) {  // 容量溢出
+        this.jobPageCurrent = Math.ceil(this.total / this.jobPageSize)
+      }
+      this.loadJobs()
     },
-    handleCurrentChange(curPageNum) {
-        this.curPageNum = curPageNum
-        this.firstIndex = (this.curPageNum - 1) * this.pageSize
-        this.lastIndex = (this.jobs.length < this.firstIndex + this.pageSize ? this.jobs.length - 1 : this.firstIndex + this.pageSize - 1 )
-        this.refreshCurPage()
-    },
-    refreshCurPage() {
-        this.curPage = []
-        for (var i = this.firstIndex; i <= this.lastIndex; ++i) {
-            this.curPage.push(this.jobs[i])
-        } 
+    changeJobPageCurrent(val) {
+      this.jobPageCurrent = val
+      this.loadJobs()
     },
     toPreImage() {
-        // this.loadJobs()
-        if (this.imageIndex == 0) {
-            this.$message.error("没有上一张了")
-            return
+      if (this.jobIndex == 0) return this.$message.info('当前已经是第一张图像了')
+      else {
+        this.jobIndex--
+        if ((this.jobIndex + 1) <= (this.jobPageCurrent - 1) * this.jobPageSize) {
+          this.jobPageCurrent--  // prev page
+          this.loadJobs('prev')
+        } else {
+          this.changeImageAndLabel('prev')
         }
-        if (this.jobs[this.imageIndex-1].job_state == '已完成') return this.$message.error("上一张已完成无法查看")
-        this.imageIndex--
-        this.refreshImageAndLabel(this.imageIndex)
-        $("div").remove(".zoomContainer")
+      }
     },
-    toNextImage() {
-        // this.loadJobs()
-        if (this.imageIndex == this.jobs.length - 1) {
-            this.$message.error("没有下一张了")
-            return
+    toNextImage(isAuto) {
+      if (isAuto) this.loadJobs()  // a job is done after submit
+      if (this.jobIndex == this.total - 1) return this.$message.info('当前已经是最后一张图像了')
+      else {
+        this.jobIndex++
+        if ((this.jobIndex + 1) > this.jobPageCurrent * this.jobPageSize) {
+          this.jobPageCurrent++  // next page
+          this.loadJobs('next')
+        } else {
+          this.changeImageAndLabel('next')
         }
-        if (this.jobs[this.imageIndex+1].job_state == '已完成') return this.$message.error("下一张已完成无法查看")
-        this.imageIndex++
-        this.refreshImageAndLabel(this.imageIndex)
-        $("div").remove(".zoomContainer")
+      }
     },
-    getImageIndexByJobId(jobId) {
-        for (var i = 0; i < this.jobs.length; ++i) {
-            if (this.jobs[i].job_id == jobId) {
-                return i
-            }
+    changeImageAndLabel(flag) {
+      var index = this.jobIndex % this.jobPageSize  // index in the subset
+
+      if (this.jobs[index].job_state == '已完成') {
+        if (flag == 'prev') {
+          this.$message.error("上一张已完成无法查看")
+          this.jobIndex++
+          if (this.index == this.jobPageSize - 1) this.jobPageCurrent++  // had changed page, need to reset
         }
-        return -1
-    },
-    refreshImageAndLabel(index) {
+        else if (flag = 'next') {
+          this.$message.error("下一张已完成无法查看")
+          this.jobIndex--
+          if (this.index == 0) this.jobPageCurrent--  // had changed page, need to reset
+        }
+        this.loadJobs()
+      } else {
         this.$http.get(config.apiUrl + '/images/' + this.jobs[index].image_id).then(res => {
-            this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
-            // console.log(this.jobs[index].label_id)
-            // console.log(this.noLabel)
-            if (!this.jobs[index].label_id) {
-                this.noLabel--
-                this.labelId = this.noLabel
-            } else {
-                this.labelId = this.jobs[index].label_id
-            }
-            this.jobId = this.jobs[index].job_id
-        }, res => {
-            // eslint-disable-next-line
-            console.log(res)
+          this.imageUrl = config.apiUrl + '/uploads/medical-images/' + res.body.url
         })
+        this.jobId = this.jobs[index].job_id
+        if (this.jobs[index].label_id) this.labelId = this.jobs[index].label_id  // has label
+        else this.labelId = -1
+        $("div").remove(".zoomContainer")
+      }
+    },
+    queryJobById(id) {
+      for (var i = 0; i < this.jobs.length; ++i) {
+        if (this.jobs[i].job_id == id) {
+          this.jobIndex = this.jobPageSize * (this.jobPageCurrent - 1) + i
+          return this.jobs[i]
+        }
+      }
+      return null
     }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

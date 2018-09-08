@@ -71,8 +71,8 @@
         
 
         <el-form-item>
-            <el-button @click="saveLabelForm" icon="el-icon-edit">保存</el-button>
-            <el-button type="primary" @click="submitLabelForm" icon="el-icon-circle-check">提交</el-button>
+          <el-button @click="saveLabelForm" icon="el-icon-edit">保存</el-button>
+          <el-button type="primary" @click="submitLabelForm" icon="el-icon-circle-check">提交</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -86,287 +86,174 @@ export default {
     // ...
   },
   props: {
-      label: Number,
-      submitId: Number
+    label: Number,
+    submitId: Number
   },
   data() {
-      return {
-          labelForm: {
-              quality: ['800'],
-              dr: false,
-              stage: '700',
-              dme: '400',
-              hr: '500',
-              age_dme: '600',
-              rvo: '900',
-              crao: '1000',
-              myopia: false,
-              od: false,
-              glaucoma: false,
-              others: false,
-              comment: ''
-          },
-          readonly: false,
-          hasLabel: false,
-          canSubmit: false,
-          isDone: false,
-          options: [{
-              value: '800',
-              label: '可接受'
-          }, {
-              value: '801',
-              label: '曝光问题'
-          }, {
-              value: '802',
-              label: '镜头污迹'
-          }, {
-              value: '803',
-              label: '视野偏差'
-          }, {
-              value: '804',
-              label: '图像失焦'
-          }, {
-              value: '805',
-              label: '其他问题'
-          }]
-      }
+    return {
+      labelForm: {
+        quality: ['800'],
+        dr: false,
+        stage: '700',
+        dme: '400',
+        hr: '500',
+        age_dme: '600',
+        rvo: '900',
+        crao: '1000',
+        myopia: false,
+        od: false,
+        glaucoma: false,
+        others: false,
+        comment: ''
+      },
+      hasLabel: false,
+      canSubmit: false,
+      isDone: false,
+      options: [
+        { value: '800', label: '可接受' },
+        { value: '801', label: '曝光问题'},
+        { value: '802', label: '镜头污迹'},
+        { value: '803', label: '视野偏差'},
+        { value: '804', label: '图像失焦'},
+        { value: '805', label: '其他问题'}
+      ]
+    }
   },
   watch: {
     label: function(val) {
-        if (val < 0) {
-            // console.log('test: ')
-            this.isDone = false
-            this.hasLabel = false
-            this.resetLabelForm()
-            return
-        }
-
-       this.hasLabel = true
-       this.loadLabel()
+      console.log('WATCH: the label has changed!')
+      if (val < 0) {
+        this.isDone = false
+        this.hasLabel = false
+        this.resetLabelForm()
+      } else {
+        this.hasLabel = true
+        this.loadLabel()
+      }
     }
   },
   created() {
-      if (this.label < 0) {
-          this.hasLabel = false
-          this.resetLabelForm()
-          return
-      }
-
+    if (this.label < 0) {
+      this.isDone = false
+      this.hasLabel = false
+      this.resetLabelForm()
+    } else {
       this.hasLabel = true
       this.loadLabel()
+    }
   },
   methods: {
-      loadLabel() {
-        if (this.label > 0) {
-            this.hasLabel = true
-            this.$http.get(config.apiUrl + '/labels/' + this.label).then(res => {
-                this.$message.success(res.body.message)
-                delete res.body.message
-                if (res.body.quality[0] == 0) {
-                    res.body.quality = ''
-                } else {
-                    for (var i = 0; i < res.body.quality.length; i++) {
-                        res.body.quality[i] = res.body.quality[i].toString()
-                    }
-                }
-                if (res.body.stage == 0) {
-                    res.body.stage = ''
-                } else {
-                    res.body.stage = res.body.stage.toString()
-                }
-                if (res.body.dme == 0) {
-                    res.body.dme = ''
-                } else {
-                    res.body.dme = res.body.dme.toString()
-                }
-                if (res.body.hr == 0) {
-                    res.body.hr = ''
-                } else {
-                    res.body.hr = res.body.hr.toString()
-                }
-                if (res.body.age_dme == 0) {
-                    res.body.age_dme = ''
-                } else {
-                    res.body.age_dme = res.body.age_dme.toString()
-                }
-                // 静脉
-                if (res.body.rvo == 0) {
-                    res.body.rvo = ''
-                } else {
-                    res.body.rvo = res.body.rvo.toString()
-                }
-                // 动脉
-                if (res.body.crao == 0) {
-                    res.body.crao = ''
-                } else {
-                    res.body.crao = res.body.crao.toString()
-                }
-                console.log(res.body)
-                this.labelForm = res.body
-                // eslint-disable-next-line
-                console.log(this.labelForm)
-            }, res => {
-                // eslint-disable-next-line
-                console.log(res)
-            })
-            if (this.submitId == -1) {
-                this.readonly = true;
-            }
+    loadLabel() {
+      if (this.label > 0) {
+        this.hasLabel = true
+        this.$http.get(config.apiUrl + '/labels/' + this.label).then(res => {
+          if (res.body.quality[0] == 0) res.body.quality = ''
+          else for (var i = 0; i < res.body.quality.length; i++) res.body.quality[i] = res.body.quality[i].toString()
+          res.body.stage = res.body.stage == 0 ? '' : res.body.stage.toString()
+          res.body.dme = res.body.dme == 0 ? '' : res.body.dme.toString()
+          res.body.hr = res.body.hr == 0 ? '' : res.body.hr.toString()
+          res.body.age_dme = res.body.age_dme == 0 ? '' : res.body.age_dme.toString()
+          res.body.rvo = res.body.rvo == 0 ? '' : res.body.rvo.toString()  // 静脉
+          res.body.crao = res.body.crao == 0 ? '' : res.body.crao.toString()  // 动脉
 
-            var userInfo = JSON.parse(window.localStorage.getItem('user'))
-            if (userInfo.authority == 101) {
-                if (this.submitId == -1) {
-                    this.isDone = true
-                    return
-                }
-                this.$http.get(config.apiUrl + '/images/' + this.submitId).then(res => {
-                if (res.body.job_state == 303) {
-                    this.isDone = true
-                }
-                }, res => {
-                    // eslint-disable-next-line
-                    console.log(res)
-                })
-            } else if (userInfo.authority == 102) {
-                this.$http.get(config.apiUrl + '/jobs/' + this.submitId).then(res => {
-                    if (res.body.job_state == 202) {
-                        this.isDone = true
-                    }
-                }, res => {
-                    // eslint-disable-next-line
-                    console.log(res)
-                })
-            }
-        }
-      },
-      saveLabelForm() {
-          if (this.isDone) return this.$message.info('已完成的标注无法操作')
-
+          delete res.body.message
+          this.labelForm = res.body
+        }, res => {
           // eslint-disable-next-line
-          console.log(this.labelForm)
-          var data = this.labelForm
-
-          if (data.quality == []) { data.quality = ['0'] }
-          if (data.stage == '') { data.stage = '0' }
-          if (data.dme == '') { data.dme = '0' }
-          if (data.hr == '') { data.hr = '0' }
-          if (data.age_dme == '') { data.age_dme = '0' }
-          for (var i = 0; i < data.quality.length; i++) {
-              data.quality[i] = parseInt(data.quality[i])
+          console.log(res)
+        })
+        
+        this.$http.get(config.apiUrl + '/jobs/' + this.submitId).then(res => {
+          if (res.body.job_state == 202) {
+            this.isDone = true
           }
-          if (data.rvo == '') { data.rvo = '0' }
-          if (data.crao == '') { data.crao = '0' }
-
-          data.stage = parseInt(data.stage)
-          data.dme = parseInt(data.dme)
-          data.hr = parseInt(data.hr)
-          data.age_dme = parseInt(data.age_dme)
-          data.rvo = parseInt(data.rvo)
-          data.crao = parseInt(data.crao)
+        }, res => {
           // eslint-disable-next-line
-          console.log(data)
-          if (!this.hasLabel) {
-              this.$http.post(config.apiUrl + '/labels/', data).then(res => {
-                  this.$message.success(res.body.message)
-                  this.hasLabel = true
-                  this.$emit('createLabel', res.body.label_id)
-
-                  // admin
-                  var userInfo = JSON.parse(window.localStorage.getItem('user'))
-                  if (userInfo.authority == 101) {
-                      this.$http.put(config.apiUrl + '/images/' + this.submitId, {
-                     label_id: res.body.label_id,
-                    }).then(res => {
-                        this.$message.success(res.body.message)
-                    }, res => {
-                        // eslint-disable-next-line
-                        console.log(res)
-                    })
-                    return
-                  }
-
-                  this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
-                     label_id: res.body.label_id,
-                     job_state: 201  // 标注中
-                  }).then(res => {
-                    this.$message.success(res.body.message)
-                  }, res => {
-                    // eslint-disable-next-line
-                    console.log(res)
-                  })
-              }, res => {
-                  // eslint-disable-next-line
-                  console.log(res)
-              })
-          } else {
-              this.$http.put(config.apiUrl + '/labels/' + this.label, data).then(res => {
-                  this.$message.success(res.body.message)
-                  this.loadLabel()
-              }, res => {
-                  // eslint-disable-next-line
-                  console.log(res)
-              })
-          }
-          this.canSubmit = true
-      },
-      submitLabelForm() {
-          if (this.isDone) return this.$message.info('已完成的标注无法操作')
-
-
-          if (!this.hasLabel || !this.canSubmit) {
-              this.$message.info('请先保存再提交')
-          } else if (this.canSubmit) {
-              this.$message.info('系统自动保存')
-              this.saveLabelForm()  // auto save
-
-              var userInfo = JSON.parse(window.localStorage.getItem('user'))
-              if (userInfo.authority == 101) {
-                 this.$http.put(config.apiUrl + '/images/' + this.submitId, {
-                     label_id: this.label,
-                     image_state: 303  // 已完成
-                 }).then(res => {
-                     this.$message.success(res.body.message)
-                     this.loadLabel()
-                 }, res => {
-                    // eslint-disable-next-line
-                    console.log(res)
-                 })
-              } else if (userInfo.authority == 102 || userInfo.authority == 104) {
-                 this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
-                     label_id: this.label,
-                     job_state: 202  // 已完成
-                 }).then(res => {
-                     this.$message.success(res.body.message)
-                     this.loadLabel()
-                 }, res => {
-                    // eslint-disable-next-line
-                    console.log(res)
-                 })
-              }
-              this.canSubmit = false
-          }
-      },
-      resetLabelForm() {
-          this.labelForm = {
-              quality: ['800'],
-              dr: false,
-              stage: '700',
-              dme: '400',
-              hr: '500',
-              age_dme: '600',
-              rvo: '900',
-              crao: '1000',
-              myopia: false,
-              od: false,
-              glaucoma: false,
-              others: false,
-              comment: ''
-          }
+          console.log(res)
+        })
       }
+    },
+    saveLabelForm() {
+      if (this.isDone) return this.$message.info('已完成的标注无法操作')
+      var data = this.labelForm
+
+      if (data.quality == []) data.quality = ['0']
+      for (var i = 0; i < data.quality.length; i++) data.quality[i] = parseInt(data.quality[i])
+      data.stage  = data.stage == '' ? 0 : parseInt(data.stage)
+      data.dme = data.dme == '' ? 0 : parseInt(data.dme)
+      data.hr = data.hr == '' ? 0 : parseInt(data.hr)
+      data.age_dme = data.age_dme == '' ? 0 : parseInt(data.age_dme)
+      data.rvo = data.rvo == '' ? 0 : parseInt(data.rvo)
+      data.crao = data.crao == '' ? 0 : parseInt(data.crao)
+
+      if (!this.hasLabel) {
+        // step 1: create the label of job
+        this.$http.post(config.apiUrl + '/labels/', data).then(res => {
+          this.hasLabel = true
+          this.$emit('createLabel', res.body.label_id)
+
+          // step 2: change the job state
+          this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
+            label_id: res.body.label_id,
+            job_state: 201  // 标注中
+          }).then(res => {
+            this.$message.success(res.body.message)
+          }, res => {
+            // eslint-disable-next-line
+            console.log(res)
+          })
+        }, res => {
+          // eslint-disable-next-line
+          console.log(res)
+        })
+      } else {
+        // just update the label
+        this.$http.put(config.apiUrl + '/labels/' + this.label, data).then(res => {
+          this.$message.success(res.body.message)
+        }, res => {
+          // eslint-disable-next-line
+          console.log(res)
+        })
+      }
+      this.canSubmit = true  // after save
+    },
+    submitLabelForm() {
+      if (this.isDone) return this.$message.info('已完成的标注无法操作')
+
+      if (!this.hasLabel || !this.canSubmit) {
+          this.$message.info('请先保存再提交')
+      } else if (this.canSubmit) {
+        this.$http.put(config.apiUrl + '/jobs/' + this.submitId, {
+          label_id: this.label,
+          job_state: 202  // 已完成
+        }).then(res => {
+          this.$message.success(res.body.message)
+          this.loadLabel()
+        }, res => {
+          // eslint-disable-next-line
+          console.log(res)
+        })
+        this.$emit('nextImage', true)  // auto
+        this.canSubmit = false
+      }
+    },
+    resetLabelForm() {
+      this.labelForm = {
+        quality: ['800'],
+        dr: false,
+        stage: '700',
+        dme: '400',
+        hr: '500',
+        age_dme: '600',
+        rvo: '900',
+        crao: '1000',
+        myopia: false,
+        od: false,
+        glaucoma: false,
+        others: false,
+        comment: ''
+      }
+    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

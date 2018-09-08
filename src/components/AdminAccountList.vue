@@ -193,14 +193,10 @@ export default {
         this.accountSelection = []
     },
     clickAccountRow(row) {
-        var id = row.account_id
-        this.accountSelectedId = id
-        // request data
-        var data;
-        this.$http.get(config.apiUrl + '/accounts/performance/' + id).then(res => {
+        this.accountSelectedId = row.account_id
+        this.$http.get(config.apiUrl + '/accounts/performance/' + this.accountSelectedId).then(res => {
             this.$message.success(res.body.message)
-            data = res.body.data
-
+            var data = res.body.data
             for (var item in data) {
                 if (item != 'progress') {
                     var dic = ['progress','quality','dr','stage','dme','hr','age_dme','rvo','crao','myopia','od','glaucoma','others']
@@ -251,7 +247,6 @@ export default {
     },
     download(data, filename) {
         if (!data) return
-
         var url = window.URL.createObjectURL(new Blob([data]))
         var link = document.createElement('a')
         link.style.display = 'none'
@@ -263,7 +258,3 @@ export default {
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>
