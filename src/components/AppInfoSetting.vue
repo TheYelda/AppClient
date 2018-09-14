@@ -99,7 +99,7 @@ export default {
         console.log(res)
       });
     },
-    beforePhotoUpload: function(file) {
+    beforePhotoUpload(file) {
         const isJPGorPNG = (file.type === 'image/jpeg' || file.type === 'image/png');
         const isSizeLimit = file.size / 1024 / 1024 < 2;
 
@@ -111,7 +111,7 @@ export default {
         }
         return isJPGorPNG && isSizeLimit;
     },
-    handlePhotoSuccess: function(response) {
+    handlePhotoSuccess(response) {
         if (response.message == '头像上传成功') {
             this.$message.success(response.message);
             this.loadInfo();

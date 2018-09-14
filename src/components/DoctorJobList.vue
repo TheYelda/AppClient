@@ -1,17 +1,23 @@
 <template>
     <el-row>
         <el-col v-if="jobListVisible">
+          <div>
+            <el-select v-model="stateFilter" placeholder="请选择只显示的任务状态" @change="changeStateFilter" style="float: right;">
+              <el-option
+                v-for="item in stateFilters"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </div>
             <el-table :data="jobs" stripe @row-click="clickJobRow">
                 <el-table-column type="index" width="55"></el-table-column>
                 <el-table-column prop="job_id" label="任务编号"></el-table-column>
                 <el-table-column prop="image_id" label="图片编号"></el-table-column>
                 <el-table-column prop="label_id" label="标注编号"></el-table-column>
-                <el-table-column 
-                    prop="job_state" 
-                    label="状态"
-                    :filters="[{text:'未标注', value:'未标注'}, {text:'标注中', value:'标注中'}, {text:'已完成', value:'已完成'}]"
-                    :filter-method="filterHandler"
-                ></el-table-column>
+                <el-table-column prop="job_state" label="状态"></el-table-column>
                 <el-table-column prop="finished_date" label="完成日期"></el-table-column>
             </el-table>
             <el-row style="margin-top: 20px;">
@@ -63,6 +69,14 @@ export default {
       jobs: [],
       total: 0,
 
+      stateFilter: '0',
+      stateFilters: [
+        { value: '0', label: '显示所有' },
+        { value: '200', label: '未标注' },
+        { value: '201', label: '标注中' },
+        { value: '202', label: '已完成' }
+      ],
+
       // info
       jobListVisible: true,
       imageUrl: '',
@@ -82,8 +96,13 @@ export default {
   methods: {
     loadJobs(needCallback) {
       var offset = (this.jobPageCurrent - 1) * this.jobPageSize
+
       var id = JSON.parse(window.localStorage.getItem('user')).account_id
-      this.$http.get(config.apiUrl + '/jobs/?account_id=' + id + '&offset=' + offset + '&limit=' + this.jobPageSize).then(res => {
+      var url = config.apiUrl + '/jobs/?account_id=' + id
+      if (this.stateFilter != '0') url = url +  '&job_state=' + this.stateFilter
+      url = url + '&offset=' + offset + '&limit=' + this.jobPageSize
+
+      this.$http.get(url).then(res => {
         this.jobs = res.body.data
         this.total = res.body.total
         var jobStateCode = { '200': '未标注', '201': '标注中', '202': '已完成' }
@@ -97,6 +116,10 @@ export default {
         // eslint-disable-next-line
         console.log(res)
       });
+    },
+    changeStateFilter() {
+      this.jobPageCurrent = 1
+      this.loadJobs()
     },
     clickJobRow(row) {
       if (row.job_state == '已完成') return this.$message.info("已完成无法查看")

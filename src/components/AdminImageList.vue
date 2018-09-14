@@ -5,15 +5,23 @@
             <el-button @click="imageUpload">导入图像</el-button>
             <el-button type="primary" @click="imageAssign">分配任务</el-button>
             <el-button type="danger" @click="imageDelete" icon="el-icon-delete">删除图像</el-button>
+            <el-select v-model="stateFilter" placeholder="请选择只显示的图像状态" @change="changeStateFilter" style="float: right;">
+              <el-option
+                v-for="item in stateFilters"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+
         </div>
         <el-table ref="imageTable" :data="images" stripe @selection-change="changeImageSelection" @row-click="clickImageRow">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="image_id" label="图片编号"></el-table-column>
             <el-table-column prop="filename" label="图片名称"></el-table-column>
             <el-table-column prop="source" label="来源"></el-table-column>
-            <el-table-column prop="state" label="状态"
-                :filters="stateFilter"
-                :filter-method="filterHandler">
+            <el-table-column prop="state" label="状态">
             </el-table-column>
         </el-table>
 
@@ -98,19 +106,15 @@ export default {
       images: [],
       total: 0,
 
-      stateFilter: [{
-          text: '已完成',
-          value: '已完成'
-      }, {
-          text: '有分歧',
-          value: '有分歧'
-      }, {
-          text: '未分配',
-          value: '未分配'
-      }, {
-          text: '进行中',
-          value: '进行中'
-      }],
+      stateFilter: '0',
+      stateFilters: [
+        { value: '0', label: '显示所有' },
+        { value: '300', label: '未分配' },
+        { value: '301', label: '进行中' },
+        { value: '302', label: '有分歧I' },
+        { value: '303', label: '有分歧II' },
+        { value: '304', label: '已完成' }
+      ],
 
       // upload
       imageUploadUrl: config.apiUrl+'/uploads/medical-images/',
@@ -146,7 +150,11 @@ export default {
   methods: {
     loadImages(needCallback) {
       var offset = (this.imagePageCurrent - 1) * this.imagePageSize
-      this.$http.get(config.apiUrl + '/images/' + '?offset=' + offset + '&limit=' + this.imagePageSize).then(res => {
+
+      var url = config.apiUrl + '/images/' + '?offset=' + offset + '&limit=' + this.imagePageSize
+      if (this.stateFilter != '0') url = url +  '&image_state=' + this.stateFilter
+
+      this.$http.get(url).then(res => {
         this.images = res.body.data
         this.total = res.body.total
         var imagesStateCode = { '300': '未分配', '301': '进行中', '302': '有分歧', '303': '有分歧', '304': '已完成'}
@@ -163,17 +171,22 @@ export default {
         console.log(res)
       })
     },
-    changeImagePageSize: function (val) {
+    changeImagePageSize(val) {
       this.imagePageSize = val
       if (this.total <= this.imagePageSize * (this.imagePageCurrent - 1)) {  // 容量溢出
         this.imagePageCurrent = Math.ceil(this.total / this.imagePageSize)
       }
       this.loadImages()
     },
-    changeImagePageCurrent: function (val) {
+    changeImagePageCurrent(val) {
       this.imagePageCurrent = val
       this.loadImages()
     },
+    changeStateFilter() {
+      this.imagePageCurrent = 1
+      this.loadImages()
+    },
+
     imageUpload() {
       this.imageUploadVisible = true;
     },

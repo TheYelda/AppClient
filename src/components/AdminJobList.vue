@@ -62,14 +62,14 @@ export default {
         console.log(res)
       });
     },
-    changeJobPageSize: function (val) {
+    changeJobPageSize(val) {
       this.jobPageSize = val
       if (this.total <= this.jobPageSize * (this.jobPageCurrent - 1)) {  // 容量溢出
         this.jobPageCurrent = Math.ceil(this.total / this.jobPageSize)
       }
       this.loadJobs()
     },
-    changeJobPageCurrent: function (val) {
+    changeJobPageCurrent(val) {
       this.jobPageCurrent = val
       this.loadJobs()
     }
